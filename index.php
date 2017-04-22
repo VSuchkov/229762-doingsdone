@@ -4,10 +4,11 @@ $task_deadline_ts = strtotime("+" . $days . " day"); // метка времен�
 $current_ts = time(); // текущая метка времени
 
 // запишите сюда дату выполнения задачи в формате дд.мм.гггг
-$date_deadline = null;
+
+$date_deadline = date("d.m.Y", $task_deadline_ts);
 
 // в эту переменную запишите кол-во дней до даты задачи
-$days_until_deadline = null;
+$days_until_deadline = floor(($task_deadline_ts - $current_ts) / 86400);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -31,7 +32,6 @@ $days_until_deadline = null;
 
             <div class="main-header__side">
                 <a class="main-header__side-item button button--plus" href="#">Добавить задачу</a>
-
                 <div class="main-header__side-item user-menu">
                     <div class="user-menu__image">
                         <img src="img/user-pic.jpg" width="40" height="40" alt="Пользователь">
@@ -39,7 +39,6 @@ $days_until_deadline = null;
 
                     <div class="user-menu__data">
                         <p>Константин</p>
-
                         <a href="#">Выйти</a>
                     </div>
                 </div>
@@ -135,7 +134,13 @@ $days_until_deadline = null;
                     </tr>
 
                     <!--добавьте здесь класс "task--important" если эта задача просрочена-->
-                    <tr class="tasks__item task">
+                    <tr class="tasks__item task
+                        <?php
+                            if ($days_until_deadline <= 0) {
+                                print("task--important");
+                            }
+                        ?>
+                        ">
                         <td class="task__select">
                             <label class="checkbox task__checkbox">
                                 <input class="checkbox__input visually-hidden" type="checkbox">
@@ -144,7 +149,9 @@ $days_until_deadline = null;
                         </td>
 
                         <td class="task__date">
-                            <!--выведите здесь дату выполнения задачи-->
+                            <?php
+                                print($date_deadline);
+                            ?>
                         </td>
 
                         <td class="task__controls">
