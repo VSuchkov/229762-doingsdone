@@ -1,43 +1,31 @@
 
 <?php
 $categories = ["Все", "Входящие", "Учеба", "Работа", "Домашние дела", "Авто"];
-$task_1 = [
-"task" => "Собеседование в IT компании",
-"date" => "01.06.2017",
-"categories" => "Работа",
-"done" => "Нет"
- ];
-$task_2 = [
-    "task" => "Выполнить тестовое задание",
-    "date" => "25.05.2017",
-    "categories" => "Работа",
-    "done" => "Нет"
+$tasks = [["task" => "Собеседование в IT компании",
+            "date" => "01.06.2017",
+            "categories" => "Работа",
+            "done" => "Нет"],
+            ["task" => "Выполнить тестовое задание",
+            "date" => "25.05.2017",
+            "categories" => "Работа",
+            "done" => "Нет"],
+            ["task" => "Сделать задание первого раздела",
+            "date" => "21.04.2017",
+            "categories" => "Учеба",
+            "done" => "Да"],
+            ["task" => "Встреча с другом",
+            "date" => "22.04.2017",
+            "categories" => "Входящие",
+            "done" => "Нет"],
+            ["task" => "Купить корм для кота",
+            "date" => "нет",
+            "categories" => "Домашние дела",
+            "done" => "Нет"],
+            ["task" => "Заказать пиццу",
+            "date" => "нет",
+            "categories" => "Домашние дела",
+            "done" => "Нет"]
 ];
-$task_3 = [
-    "task" => "Сделать задание первого раздела",
-    "date" => "21.04.2017",
-    "categories" => "Учеба",
-    "done" => "Да"
-];
-$task_4 = [
-    "task" => "Встреча с другом",
-    "date" => "22.04.2017",
-    "categories" => "Входящие",
-    "done" => "Нет"
-];
-$task_5 = [
-    "task" => "Купить корм для кота",
-    "date" => "нет",
-    "categories" => "Домашние дела",
-    "done" => "Нет"
-];
-$task_6 = [
-    "task" => "Заказать пиццу",
-    "date" => "нет",
-    "categories" => "Домашние дела",
-    "done" => "Нет"
-];
-$tasks = [$task_1, $task_2, $task_3, $task_4, $task_5, $task_6];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -153,7 +141,7 @@ $tasks = [$task_1, $task_2, $task_3, $task_4, $task_5, $task_6];
                     <?php foreach ($tasks as $key => $val): ?>
                     <tr class="tasks__item task
                     <?php
-                        if ($tasks["done"] == "Да") {
+                        if ($val["done"] == "Да") {
                             print("task--completed");
                         }
                     ?>
@@ -170,13 +158,8 @@ $tasks = [$task_1, $task_2, $task_3, $task_4, $task_5, $task_6];
                         <td class="task__date">
                         <?=$val["date"];?>
                         </td>
-                        <td class="task__categories">
-                        <?=$val["categories"];?>
-                        </td>
-                        <td class="task__progress">
-                        <?=$val["done"];?>
-                        </td>
-                        <?php endforeach; ?>
+
+
                         <td class="task__controls">
                             <button class="expand-control" type="button" name="button">Выполнить первое задание</button>
 
@@ -194,6 +177,7 @@ $tasks = [$task_1, $task_2, $task_3, $task_4, $task_5, $task_6];
                                 </li>
                             </ul>
                         </td>
+                        <?php endforeach; ?>
                     </tr>
                 </table>
             </main>
