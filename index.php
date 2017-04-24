@@ -1,4 +1,44 @@
 
+<?php
+$categories = ["Все", "Входящие", "Учеба", "Работа", "Домашние дела", "Авто"];
+$task_1 = [
+"task" => "Собеседование в IT компании",
+"date" => "01.06.2017",
+"categories" => "Работа",
+"done" => "Нет"
+ ];
+$task_2 = [
+    "task" => "Выполнить тестовое задание",
+    "date" => "25.05.2017",
+    "categories" => "Работа",
+    "done" => "Нет"
+];
+$task_3 = [
+    "task" => "Сделать задание первого раздела",
+    "date" => "21.04.2017",
+    "categories" => "Учеба",
+    "done" => "Да"
+];
+$task_4 = [
+    "task" => "Встреча с другом",
+    "date" => "22.04.2017",
+    "categories" => "Входящие",
+    "done" => "Нет"
+];
+$task_5 = [
+    "task" => "Купить корм для кота",
+    "date" => "нет",
+    "categories" => "Домашние дела",
+    "done" => "Нет"
+];
+$task_6 = [
+    "task" => "Заказать пиццу",
+    "date" => "нет",
+    "categories" => "Домашние дела",
+    "done" => "Нет"
+];
+$tasks = [$task_1, $task_2, $task_3, $task_4, $task_5, $task_6];
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -36,58 +76,34 @@
 
 
         <div class="content">
-            <?php
-            $categories = ["Все", "Входящие", "Учеба", "Работа", "Домашние дела", "Авто"];
-            ?>
             <section class="content__side">
                 <h2 class="content__side-heading">Проекты</h2>
 
                 <nav class="main-navigation">
                     <ul class="main-navigation__list">
                         <?php
-                        $index = 1;
+                        $index = 0;
                         $num = count($categories);
+                         while ($index < $num) {
+                            $cat = $categories[$index];
+                            if ($index == 0) {
                             print (
                                 '<li class="main-navigation__list-item main-navigation__list-item--active">
-                                    <a class="main-navigation__list-item-link" href="#">' . $categories[1] . '</a>
-                                    <span class="main-navigation__list-item-count">24</span>
-                                </li>'
-                            );
-                        while ($index < $num) {
-                            $cat = $categories[$index];
-                            print (
-                                '<li class="main-navigation__list-item ">
                                     <a class="main-navigation__list-item-link" href="#">' . $cat . '</a>
                                     <span class="main-navigation__list-item-count">24</span>
                                 </li>'
                             );
+                            } else {
+                            print (
+                                '<li class="main-navigation__list-item">
+                                    <a class="main-navigation__list-item-link" href="#">' . $cat . '</a>
+                                    <span class="main-navigation__list-item-count">24</span>
+                                </li>'
+                            );
+                            }
                             $index = $index + 1;
                         }
                         ?>
-                        <li class="main-navigation__list-item ">
-                            <a class="main-navigation__list-item-link" href="#">Входящие</a>
-                            <span class="main-navigation__list-item-count">24</span>
-                        </li>
-
-                        <li class="main-navigation__list-item">
-                            <a class="main-navigation__list-item-link" href="#">Учеба</a>
-                            <span class="main-navigation__list-item-count">12</span>
-                        </li>
-
-                        <li class="main-navigation__list-item">
-                            <a class="main-navigation__list-item-link" href="#">Здоровье</a>
-                            <span class="main-navigation__list-item-count">3</span>
-                        </li>
-
-                        <li class="main-navigation__list-item">
-                            <a class="main-navigation__list-item-link" href="#">Домашние дела</a>
-                            <span class="main-navigation__list-item-count">7</span>
-                        </li>
-
-                        <li class="main-navigation__list-item">
-                            <a class="main-navigation__list-item-link" href="#">Авто</a>
-                            <span class="main-navigation__list-item-count">0</span>
-                        </li>
                     </ul>
                 </nav>
 
@@ -131,74 +147,54 @@
                         <span class="checkbox__text">Показывать выполненные</span>
                     </label>
                 </div>
-                <?php
-                    $task_1 = [
-                        "task" => "Собеседование в IT компании",
-                        "date" => "01.06.2017",
-                        "categories" => "Работа",
-                        "done" => "Нет"
-                    ];
-                    $task_2 = [
-                        "task" => "Выполнить тестовое задание",
-                        "date" => "25.05.2017",
-                        "categories" => "Работа",
-                        "done" => "Нет"
-                    ];
-                    $task_3 = [
-                        "task" => "Сделать задание первого раздела",
-                        "date" => "21.04.2017",
-                        "categories" => "Учеба",
-                        "done" => "Да"
-                    ];
-                    $task_4 = [
-                        "task" => "Встреча с другом",
-                        "date" => "22.04.2017",
-                        "categories" => "Входящие",
-                        "done" => "Нет"
-                    ];
-                    $task_5 = [
-                        "task" => "Купить корм для кота",
-                        "date" => "нет",
-                        "categories" => "Домашние дела",
-                        "done" => "Нет"
-                    ];
-                    $task_6 = [
-                        "task" => "Заказать пиццу",
-                        "date" => "Нет",
-                        "categories" => "Домашние дела",
-                        "done" => "Нет"
-                    ];
-                    $tasks = [$task_1, $task_2, $task_3, $task_4, $task_5, $task_6];
-                ?>
-                <table class="tasks">
-                    <?php foreach ($tasks as $key => $val) : ?>
 
-                    <tr class="tasks__item
+
+                <table class="tasks">
+                    <?php foreach ($tasks as $key => $val): ?>
+                    <tr class="tasks__item task
                     <?php
-                        if ($key = "Да") {
+                        if ($tasks["done"] == "Да") {
                             print("task--completed");
                         }
                     ?>
                     ">
                         <td class="task__select">
-
-                        <?=$val["task"];?>
+                            <label class="checkbox task__checkbox">
+                                <input class="checkbox__input visually-hidden" type="checkbox">
+                                <span class="checkbox__text">
+                                <?=$val["task"];?>
+                                </span>
+                            </label>
                         </td>
+
                         <td class="task__date">
                         <?=$val["date"];?>
                         </td>
                         <td class="task__categories">
                         <?=$val["categories"];?>
                         </td>
-
-                        <td class="task__controls
-                        ">
+                        <td class="task__progress">
                         <?=$val["done"];?>
                         </td>
+                        <?php endforeach; ?>
+                        <td class="task__controls">
+                            <button class="expand-control" type="button" name="button">Выполнить первое задание</button>
+
+                            <ul class="expand-list hidden">
+                                <li class="expand-list__item">
+                                    <a href="#">Выполнить</a>
+                                </li>
+
+                                <li class="expand-list__item">
+                                    <a href="#">Удалить</a>
+                                </li>
+
+                                <li class="expand-list__item">
+                                    <a href="#">Дублировать</a>
+                                </li>
+                            </ul>
+                        </td>
                     </tr>
-
-
-                    <?php endforeach; ?>
                 </table>
             </main>
         </div>
