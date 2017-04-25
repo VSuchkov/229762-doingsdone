@@ -85,12 +85,12 @@ $tasks = [
                        <?php foreach ($categories as $key => $val) : ?>
                         <li class="main-navigation__list-item
                         <?php
-                        if ($key == 1) {
-                        print("main-navigation__list-item--active");
+                        if ($key == 0) {
+                        print ("main-navigation__list-item--active");
                         }
                         ?>
                         ">
-                            <a class="main-navigation__list-item-link" href="#">' <?=$val;?> '</a>
+                            <a class="main-navigation__list-item-link" href="#"> <?=$val;?> </a>
                             <span class="main-navigation__list-item-count">24</span>
                         </li>
                         <?php endforeach; ?>
@@ -163,12 +163,8 @@ $tasks = [
 
 
                         <td class="task__controls">
-                            <button class="expand-control" type="button" name="button">Выполнить
-                            <?
-                            $key = $key + 1;
-                            print($key);
-                            ?>
-                            задание
+                            <button class="expand-control" type="button" name="button">
+                            <?=$val["task"];?>
                             </button>
 
                             <ul class="expand-list hidden">
