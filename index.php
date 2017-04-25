@@ -1,30 +1,43 @@
 
 <?php
 $categories = ["Все", "Входящие", "Учеба", "Работа", "Домашние дела", "Авто"];
-$tasks = [["task" => "Собеседование в IT компании",
+$tasks = [
+          [
+            "task" => "Собеседование в IT компании",
             "date" => "01.06.2017",
             "categories" => "Работа",
-            "done" => "Нет"],
-            ["task" => "Выполнить тестовое задание",
+            "done" => 0
+          ],
+          [
+            "task" => "Выполнить тестовое задание",
             "date" => "25.05.2017",
             "categories" => "Работа",
-            "done" => "Нет"],
-            ["task" => "Сделать задание первого раздела",
+            "done" => 0
+          ],
+          [
+            "task" => "Сделать задание первого раздела",
             "date" => "21.04.2017",
             "categories" => "Учеба",
-            "done" => "Да"],
-            ["task" => "Встреча с другом",
+            "done" => 1
+          ],
+          [
+            "task" => "Встреча с другом",
             "date" => "22.04.2017",
             "categories" => "Входящие",
-            "done" => "Нет"],
-            ["task" => "Купить корм для кота",
+            "done" => 0
+          ],
+          [
+            "task" => "Купить корм для кота",
             "date" => "нет",
             "categories" => "Домашние дела",
-            "done" => "Нет"],
-            ["task" => "Заказать пиццу",
+            "done" => 0
+          ],
+          [
+            "task" => "Заказать пиццу",
             "date" => "нет",
             "categories" => "Домашние дела",
-            "done" => "Нет"]
+            "done" => 0
+          ]
 ];
 ?>
 <!DOCTYPE html>
@@ -69,29 +82,18 @@ $tasks = [["task" => "Собеседование в IT компании",
 
                 <nav class="main-navigation">
                     <ul class="main-navigation__list">
+                       <?php foreach ($categories as $key => $val) : ?>
+                        <li class="main-navigation__list-item
                         <?php
-                        $index = 0;
-                        $num = count($categories);
-                         while ($index < $num) {
-                            $cat = $categories[$index];
-                            if ($index == 0) {
-                            print (
-                                '<li class="main-navigation__list-item main-navigation__list-item--active">
-                                    <a class="main-navigation__list-item-link" href="#">' . $cat . '</a>
-                                    <span class="main-navigation__list-item-count">24</span>
-                                </li>'
-                            );
-                            } else {
-                            print (
-                                '<li class="main-navigation__list-item">
-                                    <a class="main-navigation__list-item-link" href="#">' . $cat . '</a>
-                                    <span class="main-navigation__list-item-count">24</span>
-                                </li>'
-                            );
-                            }
-                            $index = $index + 1;
+                        if ($key == 1) {
+                        print("main-navigation__list-item--active");
                         }
                         ?>
+                        ">
+                            <a class="main-navigation__list-item-link" href="#">' <?=$val;?> '</a>
+                            <span class="main-navigation__list-item-count">24</span>
+                        </li>
+                        <?php endforeach; ?>
                     </ul>
                 </nav>
 
@@ -141,7 +143,7 @@ $tasks = [["task" => "Собеседование в IT компании",
                     <?php foreach ($tasks as $key => $val): ?>
                     <tr class="tasks__item task
                     <?php
-                        if ($val["done"] == "Да") {
+                        if ($val["done"] == 1) {
                             print("task--completed");
                         }
                     ?>
@@ -161,7 +163,13 @@ $tasks = [["task" => "Собеседование в IT компании",
 
 
                         <td class="task__controls">
-                            <button class="expand-control" type="button" name="button">Выполнить первое задание</button>
+                            <button class="expand-control" type="button" name="button">Выполнить
+                            <?
+                            $key = $key + 1;
+                            print($key);
+                            ?>
+                            задание
+                            </button>
 
                             <ul class="expand-list hidden">
                                 <li class="expand-list__item">
