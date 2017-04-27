@@ -39,7 +39,22 @@ $tasks = [
             "done" => 0
           ]
 ];
+function calculateTasks($tasks, $categories) {
+
+    if ($categories == 'Все') {
+        return count($tasks);
+    }
+    $count = 0;
+    foreach ($tasks as $task_value) {
+        if ($task_value['categories'] == $categories) {
+            $count++;
+        }
+    }
+    return $count;
+}
+
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 
