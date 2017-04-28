@@ -105,7 +105,7 @@ function calculateTasks($task_list, $name_of_project) {
                         ?>
                         ">
                             <a class="main-navigation__list-item-link" href="#"> <?=$val;?> </a>
-                            <span class="main-navigation__list-item-count"><?= calculateTasks($task_list, $name_of_project); ?></span>
+                            <span class="main-navigation__list-item-count"><?= calculateTasks($tasks, $val);?></span>
                         </li>
                         <?php endforeach; ?>
                     </ul>
