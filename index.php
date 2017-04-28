@@ -39,7 +39,21 @@ $tasks = [
             "done" => 0
           ]
 ];
+function calculateTasks($task_list, $name_of_project) {
+    $task_counter = 0;
+    if ($name_of_project == "Все") {
+        $task_counter = count($task_list);
+    } else {
+        foreach ($task_list as $key => $val) {
+            if ($val["categories"] == $name_of_project) {
+            $task_counter++;
+            }
+        }
+    }
+    return $task_counter;
+}
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -91,7 +105,7 @@ $tasks = [
                         ?>
                         ">
                             <a class="main-navigation__list-item-link" href="#"> <?=$val;?> </a>
-                            <span class="main-navigation__list-item-count">24</span>
+                            <span class="main-navigation__list-item-count"><?= calculateTasks($tasks, $val);?></span>
                         </li>
                         <?php endforeach; ?>
                     </ul>
