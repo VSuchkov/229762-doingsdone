@@ -58,34 +58,7 @@ require_once('./functions.php');
 <div class="page-wrapper">
     <div class="container container--with-sidebar">
     <?=includeTemplate('./templates/header.php', []); ?>
-
-
-        <div class="content">
-            <section class="content__side">
-                <h2 class="content__side-heading">Проекты</h2>
-
-                <nav class="main-navigation">
-                    <ul class="main-navigation__list">
-                       <?php foreach ($categories as $key => $val) : ?>
-                        <li class="main-navigation__list-item
-                        <?php
-                        if ($key == 0) {
-                        print ("main-navigation__list-item--active");
-                        }
-                        ?>
-                        ">
-                            <a class="main-navigation__list-item-link" href="#"> <?=$val;?> </a>
-                            <span class="main-navigation__list-item-count"><?= calculateTasks($tasks, $val);?></span>
-                        </li>
-                        <?php endforeach; ?>
-                    </ul>
-                </nav>
-
-                <a class="button button--transparent button--plus content__side-button" href="#">Добавить проект</a>
-            </section>
-            <?=includeTemplate('./templates/main.php', ["categories" => $categories, "tasks" => $tasks]); ?>
-
-        </div>
+    <?=includeTemplate('./templates/main.php', ["categories" => $categories, "tasks" => $tasks]); ?>
     </div>
 </div>
 
