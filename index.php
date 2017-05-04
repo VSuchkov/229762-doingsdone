@@ -39,7 +39,25 @@ $tasks = [
             "done" => 0
           ]
 ];
+
 require_once('./functions.php');
+/*проверяем существование переменной*/
+if (isset($_GET["categories"])) {
+/*получаем номер категории и проверяем её наличие*/
+    if (isset($categories[$_GET["categories"]])) {
+/*условие для показа задач для проекта*/
+
+    $categoryId = $_GET["categories"];
+
+/*условие для возврата строки 404*/
+}   else {
+        header("HTTP/1.1 404 Not Found");
+    }
+}
+/*условие показывать все задачи(соответствует $categories[0])*/
+     else {
+       $categoryId = 0;
+}
 ?>
 
 <!DOCTYPE html>
@@ -57,6 +75,7 @@ require_once('./functions.php');
 
 <div class="page-wrapper">
     <div class="container container--with-sidebar">
+
     <?=includeTemplate('./templates/header.php', []); ?>
     <?=includeTemplate('./templates/main.php', ["categories" => $categories, "tasks" => $tasks]); ?>
     </div>

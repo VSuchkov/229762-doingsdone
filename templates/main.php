@@ -12,7 +12,7 @@
                 }
                 ?>
                 ">
-                    <a class="main-navigation__list-item-link" href="./index.php?categories=<?php print htmlspecialchars($key); ?><?php print htmlspecialchars($val); ?>"> <?=htmlspecialchars($val);?> </a>
+                    <a class="main-navigation__list-item-link" href="./index.php?categories=<?php print htmlspecialchars($key); ?>"> <?=htmlspecialchars($val);?> </a>
                     <span class="main-navigation__list-item-count"> <?= calculateTasks($array["tasks"], $val);?> </span>
                 </li>
                 <?php endforeach; ?>
@@ -50,6 +50,7 @@
 
         <table class="tasks">
             <?php foreach ($array["tasks"] as $key => $val): ?>
+            <?php if ($array["categories"][$array["categoryId"]] == $val['tasks']): ?>
             <tr class="tasks__item task
             <?php
                 if ($val["done"] == 1) {
@@ -90,6 +91,7 @@
                         </li>
                     </ul>
                 </td>
+                <?php endif; ?>
                 <?php endforeach; ?>
             </tr>
         </table>
