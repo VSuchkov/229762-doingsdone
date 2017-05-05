@@ -46,16 +46,13 @@ if (isset($_GET["categories"])) {
 /*получаем номер категории и проверяем её наличие*/
     if (isset($categories[$_GET["categories"]])) {
 /*условие для показа задач для проекта*/
-
-    $categoryId = $_GET["categories"];
-
+        $categoryId = $_GET["categories"];
 /*условие для возврата строки 404*/
-}   else {
-        header("HTTP/1.1 404 Not Found");
+    } else {
+        return header("HTTP/1.1 404 Not Found");
     }
-}
 /*условие показывать все задачи(соответствует $categories[0])*/
-     else {
+} else {
        $categoryId = 0;
 }
 ?>
@@ -77,7 +74,7 @@ if (isset($_GET["categories"])) {
     <div class="container container--with-sidebar">
 
     <?=includeTemplate('./templates/header.php', []); ?>
-    <?=includeTemplate('./templates/main.php', ["categories" => $categories, "tasks" => $tasks]); ?>
+    <?=includeTemplate('./templates/main.php', ["categories" => $categories, "tasks" => $tasks, "categoryId" => $categoryId]); ?>
     </div>
 </div>
 

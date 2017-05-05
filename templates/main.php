@@ -8,11 +8,11 @@
                 <li class="main-navigation__list-item
                 <?php
                 if ($key == 0) {
-                print ("main-navigation__list-item--active");
+                    print ("main-navigation__list-item--active");
                 }
                 ?>
                 ">
-                    <a class="main-navigation__list-item-link" href="./index.php?categories=<?php print htmlspecialchars($key); ?>"> <?=htmlspecialchars($val);?> </a>
+                    <a class="main-navigation__list-item-link" href="./index.php?categories=<?=$key;?>"> <?=htmlspecialchars($val);?> </a>
                     <span class="main-navigation__list-item-count"> <?= calculateTasks($array["tasks"], $val);?> </span>
                 </li>
                 <?php endforeach; ?>
@@ -50,7 +50,7 @@
 
         <table class="tasks">
             <?php foreach ($array["tasks"] as $key => $val): ?>
-            <?php if ($array["categories"][$array["categoryId"]] == $val['tasks']): ?>
+            <?php if (($array["categories"][$array["categoryId"]] == $val['tasks']) || ($array["categoryId"] == 0)): ?>
             <tr class="tasks__item task
             <?php
                 if ($val["done"] == 1) {
