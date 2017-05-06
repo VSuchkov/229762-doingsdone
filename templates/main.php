@@ -4,12 +4,12 @@
 
         <nav class="main-navigation">
             <ul class="main-navigation__list">
-               <?php foreach ($array['categories'] as $key => $val): ?>
+            <?php foreach ($array['categories'] as $key => $val): ?>
                 <li class="main-navigation__list-item
                 <?php
-                if ($key == 0) {
-                    print ("main-navigation__list-item--active");
-                }
+                    if ($key == $array["categoryId"]) {
+                        print ("main-navigation__list-item--active");
+                    }
                 ?>
                 ">
                     <a class="main-navigation__list-item-link" href="./index.php?categories=<?=$key;?>"> <?=htmlspecialchars($val);?> </a>
@@ -50,48 +50,48 @@
 
         <table class="tasks">
             <?php foreach ($array["tasks"] as $key => $val): ?>
-            <?php if (($array["categories"][$array["categoryId"]] == $val['tasks']) || ($array["categoryId"] == 0)): ?>
-            <tr class="tasks__item task
-            <?php
-                if ($val["done"] == 1) {
-                    print("task--completed");
-                }
-            ?>
-            ">
-                <td class="task__select">
-                    <label class="checkbox task__checkbox">
-                        <input class="checkbox__input visually-hidden" type="checkbox">
-                        <span class="checkbox__text">
+                <?php if (($array["categories"][$array["categoryId"]] == $val["categories"]) || ($array["categoryId"] == 0)): ?>
+                <tr class="tasks__item task
+                <?php
+                    if ($val["done"] == 1) {
+                        print("task--completed");
+                    }
+                ?>
+                ">
+                    <td class="task__select">
+                        <label class="checkbox task__checkbox">
+                            <input class="checkbox__input visually-hidden" type="checkbox">
+                            <span class="checkbox__text">
+                            <?=htmlspecialchars($val["task"]);?>
+                            </span>
+                        </label>
+                    </td>
+
+                    <td class="task__date">
+                    <?=htmlspecialchars($val["date"]);?>
+                    </td>
+
+
+                    <td class="task__controls">
+                        <button class="expand-control" type="button" name="button">
                         <?=htmlspecialchars($val["task"]);?>
-                        </span>
-                    </label>
-                </td>
+                        </button>
 
-                <td class="task__date">
-                <?=htmlspecialchars($val["date"]);?>
-                </td>
+                        <ul class="expand-list hidden">
+                            <li class="expand-list__item">
+                                <a href="#">Выполнить</a>
+                            </li>
 
+                            <li class="expand-list__item">
+                                <a href="#">Удалить</a>
+                            </li>
 
-                <td class="task__controls">
-                    <button class="expand-control" type="button" name="button">
-                    <?=htmlspecialchars($val["task"]);?>
-                    </button>
-
-                    <ul class="expand-list hidden">
-                        <li class="expand-list__item">
-                            <a href="#">Выполнить</a>
-                        </li>
-
-                        <li class="expand-list__item">
-                            <a href="#">Удалить</a>
-                        </li>
-
-                        <li class="expand-list__item">
-                            <a href="#">Дублировать</a>
-                        </li>
-                    </ul>
-                </td>
-                <?php endif; ?>
+                            <li class="expand-list__item">
+                                <a href="#">Дублировать</a>
+                            </li>
+                        </ul>
+                    </td>
+                    <?php endif; ?>
                 <?php endforeach; ?>
             </tr>
         </table>
