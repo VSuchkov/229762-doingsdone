@@ -45,6 +45,7 @@ $tasks = [
           ]
 ];
 
+
 require_once('./functions.php');
 /*проверяем существование переменной*/
 if (isset($_GET["categories"])) {
@@ -60,6 +61,41 @@ if (isset($_GET["categories"])) {
 } else {
        $categoryId = 0;
 }
+
+$newtask = [];/*создаем пустой массив для новой задачи*/
+$formerror = [];/*массив для ошибок*/
+/*подключаем форму*/
+if (isset($_GET["add"])) {
+    includeTemplate('./templates/form.php', ["categories" => $categories,]);
+}
+if (isset($_POST["newtask"])) {
+    $newtask += ["done" => 0]; /*добавляем сразу ключ-значение выполнения задачи*/
+    $newtask += ["task" => htmlspecialchars($_POST["task"])];/*экранируем название задачи*/
+    $newtask += ["date" => htmlspecialchars($_POST["date"])];/*экранируем дату*/
+    $newtask += ["categories" => htmlspecialchars($_POST["categories"])];/*экранируем категорию*/
+}
+
+if ($_POST["task"] == "") {
+    $formerror += ["task" => 1]; /*добавляем о том что ошибка истинна*/
+}
+if ($_POST["date"] == "") {
+    $formerror += ["date" => 1]; /*добавляем о том что ошибка истинна*/
+}
+if ($_POST["categories"] == "") {
+    $formerror += ["categories" => 1]; /*добавляем о том что ошибка истинна*/
+}
+$errors = count($formerror);/*переменная количества ошибок формы*/
+if ($errors > 0) { /*считаем количество ошибок*/
+    includeTemplate('./templates/form.php', ["categories" => $categories, "formerror" => $formerror, "newtask" => $newtask]);
+}
+if ($errors == 0) {
+    arrat_splice($tasks, 0, 0, $newtask);
+}
+
+if (isset($_FILES["preview"])) {/*проверяем загружен ли файл*/
+    move_uploaded_file($_FILES["preview"]["tmp-name"], $_FILES["preview"]["tmp-name"]);/*сохраняем файл в корневой каталог*/
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -72,12 +108,17 @@ if (isset($_GET["categories"])) {
     <link rel="stylesheet" href="css/style.css">
 </head>
 
-<body><!--class="overlay"-->
+<body
+    <?php
+            if (isset($_GET["add"])) {
+            print('class="overlay"');
+        }
+    ?>
+><!--class="overlay"-->
 <h1 class="visually-hidden">Дела в порядке</h1>
 
 <div class="page-wrapper">
     <div class="container container--with-sidebar">
-
     <?=includeTemplate('./templates/header.php', []); ?>
     <?=includeTemplate('./templates/main.php', ["categories" => $categories, "tasks" => $tasks, "categoryId" => $categoryId]); ?>
     </div>
@@ -85,49 +126,7 @@ if (isset($_GET["categories"])) {
 
 
 <?=includeTemplate('./templates/footer.php', []); ?>
-<div class="modal" hidden>
-    <button class="modal__close" type="button" name="button">Закрыть</button>
 
-    <h2 class="modal__heading">Добавление задачи</h2>
-
-    <form class="form" class="" action="index.html" method="post">
-        <div class="form__row">
-            <label class="form__label" for="name">Название <sup>*</sup></label>
-
-            <input class="form__input" type="text" name="name" id="name" value="" placeholder="Введите название">
-        </div>
-
-        <div class="form__row">
-            <label class="form__label" for="project">Проект <sup>*</sup></label>
-
-            <select class="form__input form__input--select" name="project" id="project">
-                <option value="">Входящие</option>
-            </select>
-        </div>
-
-        <div class="form__row">
-            <label class="form__label" for="date">Дата выполнения <sup>*</sup></label>
-
-            <input class="form__input form__input--date" type="text" name="date" id="date" value="" placeholder="Введите дату в формате ДД.ММ.ГГГГ">
-        </div>
-
-        <div class="form__row">
-            <label class="form__label" for="file">Файл</label>
-
-            <div class="form__input-file">
-                <input class="visually-hidden" type="file" name="preview" id="preview" value="">
-
-                <label class="button button--transparent" for="preview">
-                    <span>Выберите файл</span>
-                </label>
-            </div>
-        </div>
-
-        <div class="form__row form__row--controls">
-            <input class="button" type="submit" name="" value="Добавить">
-        </div>
-    </form>
-</div>
 
 <script type="text/javascript" src="js/script.js"></script>
 </body>
