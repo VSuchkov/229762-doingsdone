@@ -89,7 +89,10 @@ if (isset($_POST["newtask"])) {
         array_unshift($tasks, $newtask);
     }
     if (isset($_FILES["preview"])) {/*проверяем загружен ли файл*/
-        move_uploaded_file($_FILES["preview"]["tmp-name"], $_FILES["preview"]["tmp-name"]);/*сохраняем файл в корневой каталог*/
+        move_uploaded_file(
+            $_FILES["preview"]["tmp_name"],
+            $_SERVER['DOCUMENT_ROOT'] . DIRECTORY_SEPARATOR . $_FILES["preview"]["name"]
+        );/*сохраняем файл в корневой каталог*/
     }
 }
 ?>
@@ -119,7 +122,6 @@ if (isset($_POST["newtask"])) {
     <?=includeTemplate('./templates/main.php', ["categories" => $categories, "tasks" => $tasks, "categoryId" => $categoryId]); ?>
     </div>
 </div>
-
 
 <?=includeTemplate('./templates/footer.php', []); ?>
 

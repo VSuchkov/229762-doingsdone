@@ -13,7 +13,13 @@
                 print ("form__input--error");
             }
         ?>
-        " type="text" name="task" id="name" value="" placeholder="Введите название">
+        " type="text" name="task" id="name"
+        <?php
+            if (isset($array["newtask"]["task"])) {
+                print('value="' . $array["newtask"]["task"] . '"');
+            }
+        ?>
+        placeholder="Введите название">
         <?php
             if (isset($array["formerror"]["task"])) {
                 print ('<span class="form__error">Заполните это поле</span>');
@@ -51,7 +57,13 @@
                 print ("form__input--error");
             }
         ?>
-        form__input--date" type="text" name="date" id="date" value="" placeholder="Введите дату в формате ДД.ММ.ГГГГ">
+        form__input--date" type="text" name="date" id="date"
+        <?php
+            if (isset($array["newtask"]["date"])) {
+                print('value="' . $array["newtask"]["date"] . '"');
+            }
+        ?>
+        placeholder="Введите дату в формате ДД.ММ.ГГГГ">
         <?php
             if (isset($array["formerror"]["date"])) {
                 print ('<span class="form__error">Заполните это поле</span>');
