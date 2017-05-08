@@ -3,19 +3,19 @@
 
     <h2 class="modal__heading">Добавление задачи</h2>
 
-    <form class="form" class="" action="index.php" method="post">
+    <form class="form" class="" action="index.php" method="post" enctype="multipart/form-data" >
       <div class="form__row">
         <label class="form__label" for="task">Название <sup>*</sup></label>
 
         <input class="form__input
         <?php
-            if (isset($array["formerror"]["name"])) {
+            if (isset($array["formerror"]["task"])) {
                 print ("form__input--error");
             }
         ?>
         " type="text" name="task" id="name" value="" placeholder="Введите название">
         <?php
-            if (isset($array["formerror"]["name"])) {
+            if (isset($array["formerror"]["task"])) {
                 print ('<span class="form__error">Заполните это поле</span>');
             }
         ?>
@@ -32,7 +32,7 @@
         ?>
         form__input--select" name="categories" id="project">
           <?php foreach ($array["categories"] as $key => $val): ?>
-          <option value=""><?=$val;?></option>
+          <option value="<?=$val;?>"><?=$val;?></option>
           <?php endforeach; ?>
         </select>
         <?php
@@ -63,7 +63,7 @@
         <label class="form__label" for="file">Файл</label>
 
         <div class="form__input-file">
-          <input class="visually-hidden" type="file" name="preview" id="preview" enctype="multipart/form-data" value="">
+          <input class="visually-hidden" type="file" name="preview" id="preview" value="">
 
           <label class="button button--transparent" for="preview">
               <span>Выберите файл</span>

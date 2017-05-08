@@ -73,29 +73,25 @@ if (isset($_POST["newtask"])) {
     $newtask += ["task" => htmlspecialchars($_POST["task"])];/*экранируем название задачи*/
     $newtask += ["date" => htmlspecialchars($_POST["date"])];/*экранируем дату*/
     $newtask += ["categories" => htmlspecialchars($_POST["categories"])];/*экранируем категорию*/
+    if ($_POST["task"] == "") {
+        $formerror += ["task" => 1]; /*добавляем о том что ошибка истинна*/
+    }
+    if ($_POST["date"] == "") {
+        $formerror += ["date" => 1]; /*добавляем о том что ошибка истинна*/
+    }
+    if ($_POST["categories"] == "") {
+        $formerror += ["categories" => 1]; /*добавляем о том что ошибка истинна*/
+    }
+    $errors = count($formerror);/*переменная количества ошибок формы*/
+    if ($errors > 0) { /*считаем количество ошибок*/
+        includeTemplate('./templates/form.php', ["categories" => $categories, "formerror" => $formerror, "newtask" => $newtask]);
+    } else {
+        array_unshift($tasks, $newtask);
+    }
+    if (isset($_FILES["preview"])) {/*проверяем загружен ли файл*/
+        move_uploaded_file($_FILES["preview"]["tmp-name"], $_FILES["preview"]["tmp-name"]);/*сохраняем файл в корневой каталог*/
+    }
 }
-
-if ($_POST["task"] == "") {
-    $formerror += ["task" => 1]; /*добавляем о том что ошибка истинна*/
-}
-if ($_POST["date"] == "") {
-    $formerror += ["date" => 1]; /*добавляем о том что ошибка истинна*/
-}
-if ($_POST["categories"] == "") {
-    $formerror += ["categories" => 1]; /*добавляем о том что ошибка истинна*/
-}
-$errors = count($formerror);/*переменная количества ошибок формы*/
-if ($errors > 0) { /*считаем количество ошибок*/
-    includeTemplate('./templates/form.php', ["categories" => $categories, "formerror" => $formerror, "newtask" => $newtask]);
-}
-if ($errors == 0) {
-    arrat_splice($tasks, 0, 0, $newtask);
-}
-
-if (isset($_FILES["preview"])) {/*проверяем загружен ли файл*/
-    move_uploaded_file($_FILES["preview"]["tmp-name"], $_FILES["preview"]["tmp-name"]);/*сохраняем файл в корневой каталог*/
-}
-
 ?>
 
 <!DOCTYPE html>
@@ -110,7 +106,7 @@ if (isset($_FILES["preview"])) {/*проверяем загружен ли фа�
 
 <body
     <?php
-            if (isset($_GET["add"])) {
+            if (isset($_GET["add"]) or ($errors > 0)) {
             print('class="overlay"');
         }
     ?>
