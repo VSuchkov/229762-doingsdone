@@ -109,7 +109,7 @@ if (isset($_POST["newtask"])) {
 
 <body
     <?php
-            if (isset($_GET["add"]) or ($errors > 0)) {
+            if (isset($_GET["add"]) || ($errors > 0)) {
             print('class="overlay"');
         }
     ?>
