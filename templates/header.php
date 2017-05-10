@@ -4,6 +4,7 @@
     </a>
 
     <div class="main-header__side">
+    <?php if (isset($_SESSION['user'])): ?>
         <a class="main-header__side-item button button--plus" href="index.php?add=1">Добавить задачу</a>
         <div class="main-header__side-item user-menu">
             <div class="user-menu__image">
@@ -11,9 +12,12 @@
             </div>
 
             <div class="user-menu__data">
-                <p>Константин</p>
-                <a href="#">Выйти</a>
+                <p><?=$_SESSION['user']["name"];?></p>
+                <a href="./logout.php">Выйти</a>
             </div>
         </div>
+    <?php else: ?>
+        <a class="main-header__side-item button button--transparent" href="index.php?login=1">Войти</a>
+    <?php endif; ?>
     </div>
 </header>
