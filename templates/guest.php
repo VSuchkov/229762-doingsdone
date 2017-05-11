@@ -58,7 +58,7 @@
 
         <input class="form__input
         <?php
-            if ((isset($array["usererror"]["email"])) || ((!isset($array["user"])) && (isset($_POST["enter"])))) {
+            if (isset($array["usererror"]["email"])) {
                 print ("form__input--error");
             }
         ?>
@@ -72,7 +72,7 @@
 
 
          value="" placeholder="Введите e-mail">
-        <?php if ((($array["usererror"]["email"] == 1)) || (($array["user"] == null) && (isset($_POST["enter"])))): ?> <!--проверяем наличие данных-->
+        <?php if (isset($array["usererror"]["email"])): ?> <!--проверяем наличие данных-->
             <p class="form__message">E-mail введён некорректно</p>
          <?php endif; ?>
 

@@ -102,7 +102,7 @@ session_start();
 if (isset($_POST["enter"])) {
     $userdata += ["email" => htmlspecialchars($_POST["email"])];
     $userdata += ["password" => password_hash(htmlspecialchars($_POST["password"]), PASSWORD_DEFAULT)];/*получаем отпечаток*/
-    if ($_POST["email"] == "") {
+    if (($_POST["email"] == "") || (searchUserByEmail($_POST["email"], $users) == null)) {
         $usererror += ["email" => 1]; /*добавляем о том что поле не заполнено*/
     }
     if ($_POST["password"] == "") {
@@ -120,6 +120,10 @@ if ((!empty($_POST["enter"])) && ($usererrors == 0)) {/*проверяем от�
     $email = $_POST["email"];
     $password = $_POST["password"];
     if ($user = searchUserByEmail($email, $users)) {
+        /*if ($user == null) {
+            $usererror += ["email" => 1];
+            includeTemplate('./templates/guest.php', ["usererror" => $usererror]);
+        } */
         if (password_verify($password, $user["password"])) {
             $_SESSION["user"] = $user;
 
