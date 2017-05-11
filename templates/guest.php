@@ -1,21 +1,5 @@
-<!DOCTYPE html>
-<html lang="en">
 
-<head>
-  <meta charset="UTF-8">
-  <title>Document</title>
-  <link rel="stylesheet" href="../css/normalize.css">
-  <link rel="stylesheet" href="../css/style.css">
-</head>
 
-<body class="body-background
-<?php
-    if ((isset($_GET["login"])) || ((count($array["usererror"]) > 0)) || ((!isset($_SESSION["user"])) && (isset($_POST["enter"])))) {
-    print("overlay");
-  }
-?>
-">
-  <!--class="overlay"-->
   <h1 class="visually-hidden">Дела в порядке</h1>
 
 
@@ -105,5 +89,3 @@
       </div>
     </form>
   </div>
-</body>
-</html>

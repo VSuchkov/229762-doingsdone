@@ -65,6 +65,8 @@ $newtask = [];/*создаем пустой массив для новой за�
 $formerror = [];/*массив для ошибок формы задач*/
 $userdata = [];/*массив для даных пользователя*/
 $usererror = [];/*массив для ошибок формы пользователя*/
+$showmodal = 0;
+
 /*подключаем форму*/
 if (isset($_GET["add"])) {
     includeTemplate('./templates/form.php', ["categories" => $categories,]);
@@ -135,6 +137,14 @@ if ((!empty($_POST["enter"])) && ($usererrors == 0)) {/*проверяем от�
         includeTemplate('./templates/guest.php', ["user" => $user]);
     }
 }
+
+/*вывод в переменный условий показа модального окна*/
+if ((isset($_GET["add"]) || ($errors > 0)) || (isset($_GET["login"])) || (($usererrors > 0)) || ((!isset($_SESSION["user"])) && (isset($_POST["enter"])))) {
+    $showmodal = 1;
+}
+
+
+
         /*array_unshift($tasks, $newtask);*/
 
 
@@ -157,7 +167,7 @@ if (isset($_GET["login"])) {
 
 <body
     <?php
-            if (isset($_GET["add"]) || ($errors > 0)) {
+        if ($showmodal == 1) {
             print('class="overlay"');
         }
     ?>
@@ -165,20 +175,14 @@ if (isset($_GET["login"])) {
 <h1 class="visually-hidden">Дела в порядке</h1>
 
 <div class="page-wrapper">
-    <div class="container
-    <?php
-        if ((!isset($_GET["login"])) && ($_SESSION["user"])) {
-            print("container--with-sidebar");
-        }
-    ?>
-    ">
+    <div class="container container--with-sidebar">
     <?php
         if ($_SESSION["user"]) {
             includeTemplate('./templates/header.php', []);
             includeTemplate('./templates/main.php', ["categories" => $categories, "tasks" => $tasks, "categoryId" => $categoryId]);
         } else {
             includeTemplate('./templates/header.php', []);
-            includeTemplate('./templates/guest.php', []);
+            includeTemplate('./templates/guest.php', ["showmodal" => $showmodal]);
         }
     ?>
     </div>
