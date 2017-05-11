@@ -97,40 +97,42 @@ if (isset($_POST["newtask"])) {
     }
 }
 session_start();
-if (isset($_GET["login"])) {
-    includeTemplate('./templates/guest.php', []);
-}
+
 
 if (isset($_POST["enter"])) {
     $userdata += ["email" => htmlspecialchars($_POST["email"])];
     $userdata += ["password" => password_hash(htmlspecialchars($_POST["password"]), PASSWORD_DEFAULT)];/*получаем отпечаток*/
     if ($_POST["email"] == "") {
-        $usererror += ["email" => 1]; /*добавляем о том поле не заполнено*/
+        $usererror += ["email" => 1]; /*добавляем о том что поле не заполнено*/
     }
     if ($_POST["password"] == "") {
         $usererror += ["password" => 1]; /*добавляем о том что поле не заполнено*/
     }
     $usererrors = count($usererror);
     if ($usererrors > 0) { /*считаем количество ошибок*/
+        includeTemplate('./templates/header.php', []);
         includeTemplate('./templates/guest.php', ["userdata" => $userdata, "usererror" => $usererror]);
-    } else {
 
-        if (!empty($_POST["enter"])) {/*проверяем была ли отправлена форма*/
-            $email = $_POST["email"];
-            $password = $_POST["password"];
-            if ($user = searchUserByEmail($email, $users)) {
-                if (password_verify($password, $user["password"])) {
-                    $_SESSION["user"] = $user;
-
-                    header("Location: /index.php");
-                } else {
-                    includeTemplate('./templates/guest.php', ["user" => $user, "password" => $password]);
-                }
-            }
-        }
-        /*array_unshift($tasks, $newtask);*/
     }
 }
+
+if ((!empty($_POST["enter"])) && ($usererrors == 0)) {/*проверяем отсутствие ошибок и была ли отправлена форма*/
+    $email = $_POST["email"];
+    $password = $_POST["password"];
+    if ($user = searchUserByEmail($email, $users)) {
+        if (password_verify($password, $user["password"])) {
+            $_SESSION["user"] = $user;
+
+            header("Location: /index.php");
+        } else {
+            includeTemplate('./templates/guest.php', ["user" => $user, "password" => $password]);
+        }
+    } else {
+        includeTemplate('./templates/guest.php', ["user" => $user]);
+    }
+}
+        /*array_unshift($tasks, $newtask);*/
+
 
 /*
 if (isset($_GET["login"])) {
@@ -159,9 +161,22 @@ if (isset($_GET["login"])) {
 <h1 class="visually-hidden">Дела в порядке</h1>
 
 <div class="page-wrapper">
-    <div class="container container--with-sidebar">
-    <?=includeTemplate('./templates/header.php', []); ?>
-    <?=includeTemplate('./templates/main.php', ["categories" => $categories, "tasks" => $tasks, "categoryId" => $categoryId]); ?>
+    <div class="container
+    <?php
+        if ((!isset($_GET["login"])) && ($_SESSION["user"])) {
+            print("container--with-sidebar");
+        }
+    ?>
+    ">
+    <?php
+        if ($_SESSION["user"]) {
+            includeTemplate('./templates/header.php', []);
+            includeTemplate('./templates/main.php', ["categories" => $categories, "tasks" => $tasks, "categoryId" => $categoryId]);
+        } else {
+            includeTemplate('./templates/header.php', []);
+            includeTemplate('./templates/guest.php', []);
+        }
+    ?>
     </div>
 </div>
 
