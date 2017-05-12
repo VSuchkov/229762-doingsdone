@@ -1,4 +1,3 @@
-
 <?php
 $categories = ["Все",
                 "Входящие",
@@ -45,7 +44,7 @@ $tasks = [
           ]
 ];
 
-
+require_once("./userdata.php");
 require_once('./functions.php');
 /*проверяем существование переменной*/
 if (isset($_GET["categories"])) {
@@ -62,17 +61,21 @@ if (isset($_GET["categories"])) {
        $categoryId = 0;
 }
 
-$newtask = [];/*создаем пустой массив для новой задачи*/
-$formerror = [];/*массив для ошибок*/
+$data = [];/*создаем пустой массив для новой задачи*/
+$formerror = [];/*массив для ошибок формы задач*/
+$showmodal = false;
+
 /*подключаем форму*/
+session_start();
 if (isset($_GET["add"])) {
-    includeTemplate('./templates/form.php', ["categories" => $categories,]);
+    $showmodal = true;
+    includeTemplate('./templates/form.php', ["categories" => $categories, "showmodal" => $showmodal]);
 }
 if (isset($_POST["newtask"])) {
-    $newtask += ["done" => 0]; /*добавляем сразу ключ-значение выполнения задачи*/
-    $newtask += ["task" => htmlspecialchars($_POST["task"])];/*экранируем название задачи*/
-    $newtask += ["date" => htmlspecialchars($_POST["date"])];/*экранируем дату*/
-    $newtask += ["categories" => htmlspecialchars($_POST["categories"])];/*экранируем категорию*/
+    $data += ["done" => 0]; /*добавляем сразу ключ-значение выполнения задачи*/
+    $data += ["task" => htmlspecialchars($_POST["task"])];/*экранируем название задачи*/
+    $data += ["date" => htmlspecialchars($_POST["date"])];/*экранируем дату*/
+    $data += ["categories" => htmlspecialchars($_POST["categories"])];/*экранируем категорию*/
     if ($_POST["task"] == "") {
         $formerror += ["task" => 1]; /*добавляем о том что ошибка истинна*/
     }
@@ -84,9 +87,10 @@ if (isset($_POST["newtask"])) {
     }
     $errors = count($formerror);/*переменная количества ошибок формы*/
     if ($errors > 0) { /*считаем количество ошибок*/
-        includeTemplate('./templates/form.php', ["categories" => $categories, "formerror" => $formerror, "newtask" => $newtask]);
+        $showmodal = true;
+        includeTemplate('./templates/form.php', ["categories" => $categories, "formerror" => $formerror, "newtask" => $data, "showmodal" => $showmodal]);
     } else {
-        array_unshift($tasks, $newtask);
+        array_unshift($tasks, $data);
     }
     if (isset($_FILES["preview"])) {/*проверяем загружен ли файл*/
         move_uploaded_file(
@@ -95,6 +99,49 @@ if (isset($_POST["newtask"])) {
         );/*сохраняем файл в корневой каталог*/
     }
 }
+
+if (isset($_POST["enter"])) {
+    $showmodal = true;
+    $data += ["email" => htmlspecialchars($_POST["email"])];
+    $data += ["password" => password_hash(htmlspecialchars($_POST["password"]), PASSWORD_DEFAULT)];
+    $email = $_POST["email"];
+    $password = $_POST["password"];
+    if ($user = searchUserByEmail($email, $users)) {
+        if (password_verify($password, $user["password"])) {
+            $_SESSION["user"] = $user;
+            header("Location: /index.php");
+        } else {
+            $formerror += ["password" => 1];
+        }
+    } else {
+        $formerror += ["email" => 1];
+        $usererrors = count($formerror);
+        includeTemplate('./templates/header.php', []);
+        includeTemplate('./templates/guest.php', ["userdata" => $data, "usererror" => $formerror, "showmodal" => $showmodal]);
+    }
+}
+if (isset($_GET["login"])) {
+    $showmodal = true;
+}
+if ($usererrors > 0) {
+    $showmodal = true;
+}
+
+/*вывод в переменный условий показа модального окна
+if ((isset($_GET["add"]) || ($errors > 0)) || (isset($_GET["login"])) || (($usererrors > 0)) || ((!isset($_SESSION["user"])) && (isset($_POST["enter"])))) {
+    $showmodal = 1;
+}
+*/
+
+
+        /*array_unshift($tasks, $newtask);*/
+
+
+/*
+if (isset($_GET["login"])) {
+    includeTemplate('./templates/guest.php', ["userdata" => $userdata,]);
+}
+*/
 ?>
 
 <!DOCTYPE html>
@@ -109,17 +156,23 @@ if (isset($_POST["newtask"])) {
 
 <body
     <?php
-            if (isset($_GET["add"]) || ($errors > 0)) {
+        if ($showmodal == true) {
             print('class="overlay"');
         }
     ?>
-><!--class="overlay"-->
+    >
 <h1 class="visually-hidden">Дела в порядке</h1>
 
 <div class="page-wrapper">
     <div class="container container--with-sidebar">
-    <?=includeTemplate('./templates/header.php', []); ?>
-    <?=includeTemplate('./templates/main.php', ["categories" => $categories, "tasks" => $tasks, "categoryId" => $categoryId]); ?>
+    <?php
+        includeTemplate('./templates/header.php', []);
+        if ($_SESSION["user"]) {
+            includeTemplate('./templates/main.php', ["categories" => $categories, "tasks" => $tasks, "categoryId" => $categoryId]);
+        } else {
+            includeTemplate('./templates/guest.php', ["showmodal" => $showmodal]);
+        }
+    ?>
     </div>
 </div>
 
