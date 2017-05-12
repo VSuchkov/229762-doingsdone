@@ -63,12 +63,13 @@ if (isset($_GET["categories"])) {
 
 $data = [];/*создаем пустой массив для новой задачи*/
 $formerror = [];/*массив для ошибок формы задач*/
-$showmodal = 0;
+$showmodal = false;
 
 /*подключаем форму*/
 session_start();
 if (isset($_GET["add"])) {
-    includeTemplate('./templates/form.php', ["categories" => $categories,]);
+    $showmodal = true;
+    includeTemplate('./templates/form.php', ["categories" => $categories, "showmodal" => $showmodal]);
 }
 if (isset($_POST["newtask"])) {
     $data += ["done" => 0]; /*добавляем сразу ключ-значение выполнения задачи*/
@@ -86,7 +87,8 @@ if (isset($_POST["newtask"])) {
     }
     $errors = count($formerror);/*переменная количества ошибок формы*/
     if ($errors > 0) { /*считаем количество ошибок*/
-        includeTemplate('./templates/form.php', ["categories" => $categories, "formerror" => $formerror, "newtask" => $data]);
+        $showmodal = true;
+        includeTemplate('./templates/form.php', ["categories" => $categories, "formerror" => $formerror, "newtask" => $data, "showmodal" => $showmodal]);
     } else {
         array_unshift($tasks, $data);
     }
@@ -97,7 +99,9 @@ if (isset($_POST["newtask"])) {
         );/*сохраняем файл в корневой каталог*/
     }
 }
-if ((!empty($_POST["enter"])) && ($usererrors == 0)) {/*проверяем отсутствие ошибок и была ли отправлена форма*/
+
+if (isset($_POST["enter"])) {
+    $showmodal = true;
     $data += ["email" => htmlspecialchars($_POST["email"])];
     $data += ["password" => password_hash(htmlspecialchars($_POST["password"]), PASSWORD_DEFAULT)];
     $email = $_POST["email"];
@@ -105,26 +109,29 @@ if ((!empty($_POST["enter"])) && ($usererrors == 0)) {/*проверяем от�
     if ($user = searchUserByEmail($email, $users)) {
         if (password_verify($password, $user["password"])) {
             $_SESSION["user"] = $user;
-
             header("Location: /index.php");
         } else {
             $formerror += ["password" => 1];
         }
     } else {
         $formerror += ["email" => 1];
-    }
-    $usererrors = count($formerror);
-    if ($usererrors > 0) { /*считаем количество ошибок*/
+        $usererrors = count($formerror);
         includeTemplate('./templates/header.php', []);
-        includeTemplate('./templates/guest.php', ["userdata" => $data, "usererror" => $formerror]);
+        includeTemplate('./templates/guest.php', ["userdata" => $data, "usererror" => $formerror, "showmodal" => $showmodal]);
     }
 }
+if (isset($_GET["login"])) {
+    $showmodal = true;
+}
+if ($usererrors > 0) {
+    $showmodal = true;
+}
 
-/*вывод в переменный условий показа модального окна*/
+/*вывод в переменный условий показа модального окна
 if ((isset($_GET["add"]) || ($errors > 0)) || (isset($_GET["login"])) || (($usererrors > 0)) || ((!isset($_SESSION["user"])) && (isset($_POST["enter"])))) {
     $showmodal = 1;
 }
-
+*/
 
 
         /*array_unshift($tasks, $newtask);*/
@@ -149,7 +156,7 @@ if (isset($_GET["login"])) {
 
 <body
     <?php
-        if ($showmodal == 1) {
+        if ($showmodal == true) {
             print('class="overlay"');
         }
     ?>

@@ -16,7 +16,7 @@
 
 <div class="modal"
 <?php
-  if ((isset($_GET["login"])) || (isset($_POST["enter"]))) {
+  if ($array["showmodal"]) {
     print ("");
   } else {/*проверка пустой ли $_GET["login"]*/
     print ("hidden");/*если параметра запроса login нет, то добавляется hidden*/
