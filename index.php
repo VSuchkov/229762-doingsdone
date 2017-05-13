@@ -1,4 +1,28 @@
 <?php
+session_start();
+require_once("./userdata.php");
+require_once('./functions.php');
+/*для cookies*/
+$show_complited = false;
+if (isset($_GET["show_complited"])) {
+    $show_complited = $_GET['show_completed'];
+    setcookie("show_complited", $show_complited, strtotime("+30 days"));
+} elseif (isset($_COOKIE["show_completed"])) {
+    $show_completed = $_COOKIE["show_completed"];
+}
+/*
+if ((isset($_COOKIE["show_complited"])) && ($show_complited == 1)) {
+    $show_complited = 1;
+    includeTemplate('./templates/main.php', ["show_complited" => $show_complited]);
+}
+setcookie("show_complited", $show_complited, strtotime("+30 days"));
+
+
+if show_complited() {
+    setcookie("show_complited", $show_complited, strtotime("+30 days"));
+}
+*/
+
 $categories = ["Все",
                 "Входящие",
                 "Учеба",
@@ -44,8 +68,6 @@ $tasks = [
           ]
 ];
 
-require_once("./userdata.php");
-require_once('./functions.php');
 /*проверяем существование переменной*/
 if (isset($_GET["categories"])) {
 /*получаем номер категории и проверяем её наличие*/
@@ -60,13 +82,11 @@ if (isset($_GET["categories"])) {
 } else {
        $categoryId = 0;
 }
-
 $data = [];/*создаем пустой массив для новой задачи*/
 $formerror = [];/*массив для ошибок формы задач*/
 $showmodal = false;
-
 /*подключаем форму*/
-session_start();
+
 if (isset($_GET["add"])) {
     $showmodal = true;
     includeTemplate('./templates/form.php', ["categories" => $categories, "showmodal" => $showmodal]);
@@ -99,7 +119,6 @@ if (isset($_POST["newtask"])) {
         );/*сохраняем файл в корневой каталог*/
     }
 }
-
 if (isset($_POST["enter"])) {
     $showmodal = true;
     $data += ["email" => htmlspecialchars($_POST["email"])];
@@ -108,8 +127,9 @@ if (isset($_POST["enter"])) {
     $password = $_POST["password"];
     if ($user = searchUserByEmail($email, $users)) {
         if (password_verify($password, $user["password"])) {
+            $showmodal = false;
             $_SESSION["user"] = $user;
-            header("Location: /index.php");
+            /*header("Location: /index.php");*/
         } else {
             $formerror += ["password" => 1];
         }
@@ -127,16 +147,17 @@ if ($usererrors > 0) {
     $showmodal = true;
 }
 
+
+
+
+
+
 /*вывод в переменный условий показа модального окна
 if ((isset($_GET["add"]) || ($errors > 0)) || (isset($_GET["login"])) || (($usererrors > 0)) || ((!isset($_SESSION["user"])) && (isset($_POST["enter"])))) {
     $showmodal = 1;
 }
 */
-
-
         /*array_unshift($tasks, $newtask);*/
-
-
 /*
 if (isset($_GET["login"])) {
     includeTemplate('./templates/guest.php', ["userdata" => $userdata,]);
@@ -168,7 +189,7 @@ if (isset($_GET["login"])) {
     <?php
         includeTemplate('./templates/header.php', []);
         if ($_SESSION["user"]) {
-            includeTemplate('./templates/main.php', ["categories" => $categories, "tasks" => $tasks, "categoryId" => $categoryId]);
+            includeTemplate('./templates/main.php', ["categories" => $categories, "tasks" => $tasks, "categoryId" => $categoryId, "show_completed" => $show_completed]);
         } else {
             includeTemplate('./templates/guest.php', ["showmodal" => $showmodal]);
         }

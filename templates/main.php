@@ -42,7 +42,13 @@
             </div>
 
             <label class="checkbox">
-                <input id="show-complete-tasks" class="checkbox__input visually-hidden" type="checkbox" checked>
+                <input id="show-complete-tasks" class="checkbox__input visually-hidden" type="checkbox"
+                <?php
+                    if ($array["show_completed"]) {
+                        print (" checked");
+                    }
+                ?>
+                >
                 <span class="checkbox__text">Показывать выполненные</span>
             </label>
         </div>
@@ -57,7 +63,15 @@
                         print("task--completed");
                     }
                 ?>
+                <?php
+                    if (($array["show_completed"]) && ($val["done"] == 1)) {
+                        print ("");
+                    } elseif ($val["done"] == 1) {
+                        print(" hidden");
+                    }
+                ?>
                 ">
+
                     <td class="task__select">
                         <label class="checkbox task__checkbox">
                             <input class="checkbox__input visually-hidden" type="checkbox">
