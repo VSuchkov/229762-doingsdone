@@ -3,13 +3,7 @@ session_start();
 require_once("./userdata.php");
 require_once('./functions.php');
 /*для cookies*/
-$show_complited = false;
-if (isset($_GET["show_complited"])) {
-    $show_complited = $_GET['show_completed'];
-    setcookie("show_complited", $show_complited, strtotime("+30 days"));
-} elseif (isset($_COOKIE["show_completed"])) {
-    $show_completed = $_COOKIE["show_completed"];
-}
+
 /*
 if ((isset($_COOKIE["show_complited"])) && ($show_complited == 1)) {
     $show_complited = 1;
@@ -129,7 +123,7 @@ if (isset($_POST["enter"])) {
         if (password_verify($password, $user["password"])) {
             $showmodal = false;
             $_SESSION["user"] = $user;
-            /*header("Location: /index.php");*/
+            header("Location: /index.php");
         } else {
             $formerror += ["password" => 1];
         }
@@ -145,6 +139,13 @@ if (isset($_GET["login"])) {
 }
 if ($usererrors > 0) {
     $showmodal = true;
+}
+$show_completed = false;
+if (isset($_GET["show_completed"])) {
+    $show_completed = $_GET['show_completed'];
+    setcookie("show_completed", $show_completed, strtotime("+30 days"));
+} elseif (isset($_COOKIE["show_completed"])) {
+    $show_completed = $_COOKIE["show_completed"];
 }
 ?>
 
