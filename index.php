@@ -146,23 +146,6 @@ if (isset($_GET["login"])) {
 if ($usererrors > 0) {
     $showmodal = true;
 }
-
-
-
-
-
-
-/*вывод в переменный условий показа модального окна
-if ((isset($_GET["add"]) || ($errors > 0)) || (isset($_GET["login"])) || (($usererrors > 0)) || ((!isset($_SESSION["user"])) && (isset($_POST["enter"])))) {
-    $showmodal = 1;
-}
-*/
-        /*array_unshift($tasks, $newtask);*/
-/*
-if (isset($_GET["login"])) {
-    includeTemplate('./templates/guest.php', ["userdata" => $userdata,]);
-}
-*/
 ?>
 
 <!DOCTYPE html>
