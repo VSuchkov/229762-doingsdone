@@ -7,20 +7,7 @@ ini_set('display_startup_errors', 1);
 session_start();
 require_once("./userdata.php");
 require_once('./functions.php');
-/*для cookies*/
 
-/*
-if ((isset($_COOKIE["show_complited"])) && ($show_complited == 1)) {
-    $show_complited = 1;
-    includeTemplate('./templates/main.php', ["show_complited" => $show_complited]);
-}
-setcookie("show_complited", $show_complited, strtotime("+30 days"));
-
-
-if show_complited() {
-    setcookie("show_complited", $show_complited, strtotime("+30 days"));
-}
-*/
 
 $categories = ["Все",
                 "Входящие",
