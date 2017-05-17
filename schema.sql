@@ -23,7 +23,7 @@ user_id INT,
 task CHAR(128),
 task_id INT,
 date_done DATETIME,
-project INT,
+project CHAR(128),
 done INT,
 path CHAR(255)
 );
