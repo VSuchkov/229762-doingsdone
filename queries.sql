@@ -5,7 +5,7 @@ SELECT * FROM projects, WHERE user_id = 100;
 SELECT * FROM tasks WHERE project_id = 50;
 
 --помечаем задачу как выполненную
-UPDATE tasks SET done = 1 WHERE id = 84;
+UPDATE tasks SET done = 1 WHERE task_id = 84;
 
 --добавляем новый проект
 INSERT INTO projects SET name = "Свободное время", user_id = 10;
