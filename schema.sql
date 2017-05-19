@@ -20,7 +20,7 @@ CREATE TABLE tasks (
 id INT AUTO_INCREMENT PRIMARY KEY,
 project_id INT,
 user_id INT,
-task CHAR(255),
+task CHAR(128),
 date_done DATETIME,
 done INT,
 path CHAR(255)
