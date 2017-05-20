@@ -17,4 +17,4 @@ INSERT INTO tasks SET task = "Погулять", date_done = '2017-05-20', proje
 SELECT * FROM tasks WHERE date_done = (NOW(), INTERVAL 1 DAY);
 
 --обновляем название задачи по её идентификатору
-UPDATE tasks SET task = "купить воды" WHERE id = 1;
+UPDATE tasks SET task = "Купить воды" WHERE id = 1;
