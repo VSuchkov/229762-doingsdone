@@ -63,7 +63,7 @@ function include_data($con, $sql, $data) {
 }
 
 function update_data($con, $table_name, $update_data, $update_condition) {
-    $sql = "UPDATE $table_name SET $update_data WHERE $update_condition VALUES ?, ?, ?, ?";
+    $sql = "UPDATE $table_name SET $update_data WHERE $update_condition VALUES (?, ?, ?, ?)";
     $merge_update = array_merge($update_data, $update_condition);
     $result = db_get_prepare_stmt($con, $sql, $merge_update);
     $records_count = mysqli_num_rows($result);
