@@ -39,13 +39,14 @@ $name = $_POST['name'];
 $password = $_POST['password'];
 $sql = 'SELECT users ('name', 'password') VALUES (?, ?)';
 function get_data($con, $sql, $data) {
+    $data_array = [];
     $result = db_get_prepare_stmt ($con, $sql, $data);
     if ($result == false) {
         return [];
     } else {
         mysqli_stmt_execute($result);
         while ($row = mysqli_fetch_array($result, MYSQLI_ASSOC) {
-            $data_array[] = $row;
+        $data_array[] = $row;
         return $data_array;
         }
     }
@@ -63,15 +64,26 @@ function include_data($con, $sql, $data) {
 }
 
 function update_data($con, $table_name, $update_data, $update_condition) {
-    $sql = "UPDATE $table_name SET $update_data WHERE $update_condition VALUES (?, ?, ?, ?)";
+    $update_string = "";
+    $condition_string = "";
+
+    foreach ($update_data as $key => $value) {
+        $update_string .= "$key = ?,";
+    }
+
+    foreach ($update_condition as $key => $value) {
+        $condition_string .= "$key = ?,";
+    }
+    $sql = "UPDATE $table_name SET $update_string WHERE $condition_string";
     $merge_update = array_merge($update_data, $update_condition);
     $result = db_get_prepare_stmt($con, $sql, $merge_update);
+    mysqli_stmt_execute($result);
     $records_count = mysqli_num_rows($result);
+
     if ($result == false) {
         return false;
     } else {
         return $records_count;
     }
 }
-
 ?>
