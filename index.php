@@ -5,10 +5,10 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 
 session_start();
-require_once("./userdata.php");
+/*require_once("./userdata.php");*/
 require_once('./functions.php');
 
-
+/*
 $categories = ["Все",
                 "Входящие",
                 "Учеба",
@@ -53,6 +53,18 @@ $tasks = [
             "done" => 0
           ]
 ];
+*/
+$con = mysqli_connect("localhost", "root", "", "doingsdone");
+
+if (!$con) {
+    print "error";
+} else {
+    $sql = "SELECT 'id', 'name' FROM projects";
+    $categories = get_data($con, $sql, []);
+}
+var_dump($categories);
+
+
 
 /*проверяем существование переменной*/
 if (isset($_GET["categories"])) {
