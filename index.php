@@ -55,16 +55,21 @@ $tasks = [
 ];
 */
 $con = mysqli_connect("localhost", "root", "", "doingsdone");
-
+$categories = [];
 if (!$con) {
     print "error";
 } else {
-    $sql = "SELECT 'id', 'name' FROM projects";
-    $categories = get_data($con, $sql, []);
+    $sql = "SELECT id, name FROM projects";
+    $array = get_data($con, $sql, []);
 }
-var_dump($categories);
 
+var_dump($array);
+foreach ($array as $key => $value) {
+    $category = $value["name"];
+    $categories .= " '$category',  " ;
 
+}
+print $categories;
 
 /*проверяем существование переменной*/
 if (isset($_GET["categories"])) {
@@ -78,7 +83,7 @@ if (isset($_GET["categories"])) {
     }
 /*условие показывать все задачи(соответствует $categories[0])*/
 } else {
-       $categoryId = 0;
+    $categoryId = 0;
 }
 $data = [];/*создаем пустой массив для новой задачи*/
 $formerror = [];/*массив для ошибок формы задач*/
