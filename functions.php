@@ -68,7 +68,7 @@ function update_data($con, $table_name, $update_data, $update_condition) {
     $update_string = implode(" = ?,", $data_keys);
     $update_string .= " = ? ";
     $condition_keys = array_keys($update_condition);
-    $condition_string = implode(" = ?,", $condition_keys);
+    $condition_string = implode(" = ? AND ", $condition_keys);
     $condition_string .= " = ? ";
     $sql = "UPDATE $table_name SET $update_string WHERE $condition_string";
     $merge_update = array_merge($update_data, $update_condition);/*объединяем массив условий и массив данных для обновления*/
