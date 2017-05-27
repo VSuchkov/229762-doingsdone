@@ -7,13 +7,13 @@
             <?php foreach ($array['categories'] as $key => $val): ?>
                 <li class="main-navigation__list-item
                 <?php
-                    if ($key == $array["categoryId"]) {
+                    if ($val['id'] == $array["categoryId"]) {
                         print ("main-navigation__list-item--active");
                     }
                 ?>
                 ">
-                    <a class="main-navigation__list-item-link" href="./index.php?categories=<?=$key;?>"> <?=htmlspecialchars($val);?> </a>
-                    <span class="main-navigation__list-item-count"> <?= calculateTasks($array["tasks"], $val);?> </span>
+                    <a class="main-navigation__list-item-link" href="./index.php?categories=<?=$val['id'];?>"> <?=htmlspecialchars($val['name']);?> </a>
+                    <span class="main-navigation__list-item-count"> <?= calculateTasks($array["tasks"], $val['id']);?> </span>
                 </li>
                 <?php endforeach; ?>
             </ul>
@@ -56,7 +56,7 @@
 
         <table class="tasks">
             <?php foreach ($array["tasks"] as $key => $val): ?>
-                <?php if (($array["categories"][$array["categoryId"]] == $val["categories"]) || ($array["categoryId"] == 0)): ?>
+                <?php if (($array["categoryId"] == $val["project_id"]) || ($array["categoryId"] == 0)): ?>
                 <tr class="tasks__item task
                 <?php
                     if ($val["done"] == 1) {
@@ -82,7 +82,7 @@
                     </td>
 
                     <td class="task__date">
-                    <?=htmlspecialchars($val["date"]);?>
+                    <?=htmlspecialchars($val["date_done"]);?>
                     </td>
 
 

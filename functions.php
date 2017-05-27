@@ -6,7 +6,7 @@ function calculateTasks($task_list, $name_of_project) {
         $task_counter = count($task_list);
     } else {
         foreach ($task_list as $key => $val) {
-            if ($val["categories"] == $name_of_project) {
+            if ($val["project_id"] == $name_of_project) {
                 $task_counter++;
             }
         }

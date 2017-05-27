@@ -3,7 +3,7 @@
 
     <h2 class="modal__heading">Добавление задачи</h2>
 
-    <form class="form" class="" action="index.php" method="post" enctype="multipart/form-data" >
+    <form class="form" action="index.php" method="post" enctype="multipart/form-data" >
       <div class="form__row">
         <label class="form__label" for="task">Название <sup>*</sup></label>
 
@@ -38,7 +38,7 @@
         ?>
         form__input--select" name="categories" id="project">
           <?php foreach ($array["categories"] as $key => $val): ?>
-          <option value="<?=$val;?>"><?=$val;?></option>
+          <option value="<?=$val["id"];?>"><?=$val["name"];?></option>
           <?php endforeach; ?>
         </select>
         <?php

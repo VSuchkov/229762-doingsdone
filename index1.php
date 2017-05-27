@@ -1,7 +1,9 @@
 <?php
+
 ini_set('error_reporting', E_ALL);
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
+
 session_start();
 /*require_once("./userdata.php");*/
 require_once('./functions.php');
@@ -53,30 +55,20 @@ $tasks = [
 ];
 */
 $con = mysqli_connect("localhost", "root", "", "doingsdone");
+
 if (!$con) {
     print "error";
 } else {
-    $sql = "SELECT id, name FROM projects";
+    $sql = "SELECT 'id', 'name' FROM projects";
     $categories = get_data($con, $sql, []);
-    /*var_dump($categories);*/
-    $sql = "SELECT id, email, login, password FROM users";
-    $users = get_data($con, $sql, []);
-    /*var_dump($users);*/
-    if (isset($_SESSION["user"])) {
-        $user_id = $_SESSION["user"]["id"];
-        $sql = "SELECT id, project_id, user_id, task, date_done, done FROM tasks WHERE user_id = $user_id";
-        $tasks = get_data($con, $sql, []);
-    }
-   /* $sql = "SELECT id, project_id, user_id, task, date_done, done FROM tasks";
-    $tasks = get_data($con, $sql, []); */
-    /*var_dump($tasks);*/
 }
+var_dump($categories);
+
+
 
 /*проверяем существование переменной*/
 if (isset($_GET["categories"])) {
 /*получаем номер категории и проверяем её наличие*/
-    $sql = "SELECT id, name FROM projects";
-    $categories = get_data($con, $sql, []);
     if (isset($categories[$_GET["categories"]])) {
 /*условие для показа задач для проекта*/
         $categoryId = $_GET["categories"];
@@ -86,12 +78,9 @@ if (isset($_GET["categories"])) {
     }
 /*условие показывать все задачи(соответствует $categories[0])*/
 } else {
-    $categoryId = 0;
+       $categoryId = 0;
 }
-
-
-
-
+$data = [];/*создаем пустой массив для новой задачи*/
 $formerror = [];/*массив для ошибок формы задач*/
 $showmodal = false;
 /*подключаем форму*/
@@ -100,22 +89,26 @@ if (isset($_GET["add"])) {
     $showmodal = true;
     includeTemplate('./templates/form.php', ["categories" => $categories, "showmodal" => $showmodal]);
 }
-
 if (isset($_POST["newtask"])) {
-    $task_data = [];
-    $task_data += ["done" => 0]; /*добавляем сразу ключ-значение выполнения задачи*/
-    $task_data += ["task" => htmlspecialchars($_POST["task"])];/*экранируем название задачи*/
-    $task_data += ["date" => htmlspecialchars($_POST["date"])];/*экранируем дату*/
-    $task_data += ["project_id" => $_GET["categories"]];
-    $task_data += ["user_id" => $_SESSION["user"]["id"]];
-    var_dump($task_data);
+    $data += ["done" => 0]; /*добавляем сразу ключ-значение выполнения задачи*/
+    $data += ["task" => htmlspecialchars($_POST["task"])];/*экранируем название задачи*/
+    $data += ["date" => htmlspecialchars($_POST["date"])];/*экранируем дату*/
+    $data += ["categories" => htmlspecialchars($_POST["categories"])];/*экранируем категорию*/
+    if ($_POST["task"] == "") {
+        $formerror += ["task" => 1]; /*добавляем о том что ошибка истинна*/
+    }
+    if ($_POST["date"] == "") {
+        $formerror += ["date" => 1]; /*добавляем о том что ошибка истинна*/
+    }
+    if ($_POST["categories"] == "") {
+        $formerror += ["categories" => 1]; /*добавляем о том что ошибка истинна*/
+    }
     $errors = count($formerror);/*переменная количества ошибок формы*/
     if ($errors > 0) { /*считаем количество ошибок*/
         $showmodal = true;
-        includeTemplate('./templates/form.php', ["categories" => $categories, "formerror" => $formerror, "newtask" => $task_data, "showmodal" => $showmodal]);
+        includeTemplate('./templates/form.php', ["categories" => $categories, "formerror" => $formerror, "newtask" => $data, "showmodal" => $showmodal]);
     } else {
-        $sql = "INSERT INTO tasks (project_id, user_id, task, date_done, done) VALUES ( ?, ?, ?, ?, ?)";
-        include_data($con, $sql, $task_data);
+        array_unshift($tasks, $data);
     }
     if (isset($_FILES["preview"])) {/*проверяем загружен ли файл*/
         move_uploaded_file(
@@ -124,62 +117,16 @@ if (isset($_POST["newtask"])) {
         );/*сохраняем файл в корневой каталог*/
     }
 }
-
-if (isset($_GET["reg"])) {
-    includeTemplate('./templates/register.php', []);
-}
-
-if (isset($_POST["registration"])) {
-    $reg_formerror = [];
-    if ($_POST["email"] == "") {
-        $reg_formerror += ["email" => 1];
-    }
-    if ($_POST["password"] == "") {
-        $reg_formerror += ["password" => 1];
-    }
-    if ($_POST["name"] == "") {
-        $reg_formerror += ["name " => 1];
-    }
-    $reg_errors = count($reg_formerror);
-    if ($reg_errors > 0) {
-        includeTemplate('./templates/register.php', ["reg_data" => $reg_data, "reg_formerror" => $reg_formerror]);
-    } else {
-        $reg_data = [];
-        $reg_data[] = htmlspecialchars($_POST["email"]);
-        $reg_data[] = htmlspecialchars($_POST["name"]);
-        $reg_data[] = password_hash(htmlspecialchars($_POST["password"]), PASSWORD_DEFAULT);
-
-        $sql = "INSERT INTO users (email, login, password) VALUES (?, ?, ?)";
-        $res = include_data($con, $sql, $reg_data);
-        if ($res) {
-            /*$reg_data += ["id" => $res];*/
-            var_dump($reg_data);
-            $_SESSION["user"] = $reg_data;
-            $tasks = [];
-            header("Location: /index.php");
-        } else {
-            print "error";
-            var_dump($reg_data);
-        }
-    }
-}
-
-
 if (isset($_POST["enter"])) {
-    $user_data = [];
     $showmodal = true;
-    $user_data += ["email" => htmlspecialchars($_POST["email"])];
-    $user_data += ["password" => password_hash(htmlspecialchars($_POST["password"]), PASSWORD_DEFAULT)];
+    $data += ["email" => htmlspecialchars($_POST["email"])];
+    $data += ["password" => password_hash(htmlspecialchars($_POST["password"]), PASSWORD_DEFAULT)];
     $email = $_POST["email"];
     $password = $_POST["password"];
     if ($user = searchUserByEmail($email, $users)) {
         if (password_verify($password, $user["password"])) {
-
             $showmodal = false;
             $_SESSION["user"] = $user;
-
-            /*$sql = "SELECT id, project_id, user_id, task, date_done, done FROM tasks WHERE user_id = $user_id";
-            $tasks = get_data($con, $sql, []);*/
             header("Location: /index.php");
         } else {
             $formerror += ["password" => 1];
@@ -188,15 +135,12 @@ if (isset($_POST["enter"])) {
         $formerror += ["email" => 1];
         $usererrors = count($formerror);
         includeTemplate('./templates/header.php', []);
-        includeTemplate('./templates/guest.php', ["userdata" => $user_data, "usererror" => $formerror, "showmodal" => $showmodal]);
+        includeTemplate('./templates/guest.php', ["userdata" => $data, "usererror" => $formerror, "showmodal" => $showmodal]);
         if ($usererrors > 0) {
             $showmodal = true;
         }
     }
 }
-
-
-
 if (isset($_GET["login"])) {
     $showmodal = true;
 }

@@ -12,7 +12,7 @@
             </div>
 
             <div class="user-menu__data">
-                <p><?=$_SESSION['user']["name"];?></p>
+                <p><?=$_SESSION['user']["login"];?></p>
                 <a href="./logout.php">Выйти</a>
             </div>
         </div>
