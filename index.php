@@ -6,52 +6,6 @@ session_start();
 /*require_once("./userdata.php");*/
 require_once('./functions.php');
 
-/*
-$categories = ["Все",
-                "Входящие",
-                "Учеба",
-                "Работа",
-                "Домашние дела",
-                "Авто"];
-$tasks = [
-          [
-            "task" => "Собеседование в IT компании",
-            "date" => "01.06.2017",
-            "categories" => "Работа",
-            "done" => 0
-          ],
-          [
-            "task" => "Выполнить тестовое задание",
-            "date" => "25.05.2017",
-            "categories" => "Работа",
-            "done" => 0
-          ],
-          [
-            "task" => "Сделать задание первого раздела",
-            "date" => "21.04.2017",
-            "categories" => "Учеба",
-            "done" => 1
-          ],
-          [
-            "task" => "Встреча с другом",
-            "date" => "22.04.2017",
-            "categories" => "Входящие",
-            "done" => 0
-          ],
-          [
-            "task" => "Купить корм для кота",
-            "date" => "нет",
-            "categories" => "Домашние дела",
-            "done" => 0
-          ],
-          [
-            "task" => "Заказать пиццу",
-            "date" => "нет",
-            "categories" => "Домашние дела",
-            "done" => 0
-          ]
-];
-*/
 $con = mysqli_connect("localhost", "root", "", "doingsdone");
 if (!$con) {
     print "error";
@@ -64,8 +18,9 @@ if (!$con) {
     /*var_dump($users);*/
     if (isset($_SESSION["user"])) {
         $user_id = $_SESSION["user"]["id"];
-        $sql = "SELECT id, project_id, user_id, task, date_done, done FROM tasks WHERE user_id = $user_id";
-        $tasks = get_data($con, $sql, []);
+        $sql = "SELECT id, project_id, user_id, task, date_done, done FROM tasks WHERE user_id = ?";
+        $tasks = get_data($con, $sql, [$user_id]);
+
     }
    /* $sql = "SELECT id, project_id, user_id, task, date_done, done FROM tasks";
     $tasks = get_data($con, $sql, []); */
@@ -95,6 +50,9 @@ if (isset($_GET["categories"])) {
 $formerror = [];/*массив для ошибок формы задач*/
 $showmodal = false;
 /*подключаем форму*/
+if (isset($_GET["new_project"])) {
+
+}
 
 if (isset($_GET["add"])) {
     $showmodal = true;
@@ -102,20 +60,36 @@ if (isset($_GET["add"])) {
 }
 
 if (isset($_POST["newtask"])) {
+    $formerror = [];
     $task_data = [];
-    $task_data += ["done" => 0]; /*добавляем сразу ключ-значение выполнения задачи*/
-    $task_data += ["task" => htmlspecialchars($_POST["task"])];/*экранируем название задачи*/
-    $task_data += ["date" => htmlspecialchars($_POST["date"])];/*экранируем дату*/
-    $task_data += ["project_id" => $_GET["categories"]];
+    $task_data += ["project_id" => $_POST["categories"]];
     $task_data += ["user_id" => $_SESSION["user"]["id"]];
-    var_dump($task_data);
-    $errors = count($formerror);/*переменная количества ошибок формы*/
+    $task_data += ["task" => htmlspecialchars($_POST["task"])];/*экранируем название задачи*/
+    $task_data += ["date_done" => @date('Y.m.d', strtotime(htmlspecialchars($_POST["date"])))];/*экранируем дату*/
+    $task_data += ["done" => 0]; /*добавляем сразу ключ-значение выполнения задачи*/
+    if ($_POST["categories"] == "") {
+        $formerror += ["categories" => 1]; /*добавляем о том что ошибка истинна*/
+    }
+    if ($_POST["task"] == "") {
+        $formerror += ["task" => 1]; /*добавляем о том что ошибка истинна*/
+    }
+    if ($_POST["date"] == "") {
+        $formerror += ["date" => 1]; /*добавляем о том что ошибка истинна*/
+    }
+
+
+    $errors = count($formerror);
     if ($errors > 0) { /*считаем количество ошибок*/
         $showmodal = true;
         includeTemplate('./templates/form.php', ["categories" => $categories, "formerror" => $formerror, "newtask" => $task_data, "showmodal" => $showmodal]);
     } else {
         $sql = "INSERT INTO tasks (project_id, user_id, task, date_done, done) VALUES ( ?, ?, ?, ?, ?)";
-        include_data($con, $sql, $task_data);
+        $res = include_data($con, $sql, $task_data);
+        if ($res) {
+            header("Location: /index.php");
+        } else {
+            print "error";
+        }
     }
     if (isset($_FILES["preview"])) {/*проверяем загружен ли файл*/
         move_uploaded_file(
@@ -130,7 +104,16 @@ if (isset($_GET["reg"])) {
 }
 
 if (isset($_POST["registration"])) {
+    $sql = "SELECT email FROM users";
+    $emails = get_data($con, $sql, []);
+    var_dump($emails);
     $reg_formerror = [];
+    $mail_busy = in_array($_POST["email"], $emails);
+    if ($mail_busy) {
+        $reg_formerror += ["mail_busy" => 1];
+
+    }
+    var_dump($reg_formerror);
     if ($_POST["email"] == "") {
         $reg_formerror += ["email" => 1];
     }
@@ -142,24 +125,20 @@ if (isset($_POST["registration"])) {
     }
     $reg_errors = count($reg_formerror);
     if ($reg_errors > 0) {
-        includeTemplate('./templates/register.php', ["reg_data" => $reg_data, "reg_formerror" => $reg_formerror]);
+        includeTemplate('./templates/register.php', [/*"reg_data" => $reg_data,*/ "reg_formerror" => $reg_formerror]);
     } else {
-        $reg_data = [];
-        $reg_data[] = htmlspecialchars($_POST["email"]);
-        $reg_data[] = htmlspecialchars($_POST["name"]);
-        $reg_data[] = password_hash(htmlspecialchars($_POST["password"]), PASSWORD_DEFAULT);
-
+        $new_user = [];
+        $new_user += ["email" => htmlspecialchars($_POST["email"])];
+        $new_user += ["login" => htmlspecialchars($_POST["name"])];
+        $new_user += ["password" => password_hash(htmlspecialchars($_POST["password"]), PASSWORD_DEFAULT)];
         $sql = "INSERT INTO users (email, login, password) VALUES (?, ?, ?)";
-        $res = include_data($con, $sql, $reg_data);
+        $res = include_data($con, $sql, $new_user);
         if ($res) {
-            /*$reg_data += ["id" => $res];*/
-            var_dump($reg_data);
-            $_SESSION["user"] = $reg_data;
-            $tasks = [];
+            $new_user += ["id" => $res];
+            $_SESSION["user"] = $new_user;
             header("Location: /index.php");
         } else {
             print "error";
-            var_dump($reg_data);
         }
     }
 }

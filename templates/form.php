@@ -38,7 +38,7 @@
         ?>
         form__input--select" name="categories" id="project">
           <?php foreach ($array["categories"] as $key => $val): ?>
-          <option value="<?=$val["id"];?>"><?=$val["name"];?></option>
+          <option value="<?=$val['id'];?>"><?=$val["name"];?></option>
           <?php endforeach; ?>
         </select>
         <?php

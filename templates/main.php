@@ -4,7 +4,18 @@
 
         <nav class="main-navigation">
             <ul class="main-navigation__list">
+                <li class="main-navigation__list-item
+                <?php
+                    if ($array["categoryId"] == 0) {
+                        print ("main-navigation__list-item--active");
+                    }
+                ?>
+                ">
+                    <a class="main-navigation__list-item-link" href="./index.php?categories=0"> Все </a>
+                    <span class="main-navigation__list-item-count"> <?= count($array["tasks"]);?> </span>
+                </li>
             <?php foreach ($array['categories'] as $key => $val): ?>
+
                 <li class="main-navigation__list-item
                 <?php
                     if ($val['id'] == $array["categoryId"]) {
@@ -19,7 +30,7 @@
             </ul>
         </nav>
 
-        <a class="button button--transparent button--plus content__side-button" href="#">Добавить проект</a>
+        <a class="button button--transparent button--plus content__side-button" href="index.php?new_project=1">Добавить проект</a>
     </section>
 
     <main class="content__main">

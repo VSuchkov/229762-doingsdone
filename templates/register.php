@@ -35,7 +35,7 @@
 
               <input class="form__input
               <?php
-                  if (isset($array["reg_formerror"]["email"])) {
+                  if (isset($array["reg_formerror"]["email"]) || isset($array["reg_formerror"]["mail_busy"])) {
                       print ('form__input--error');
                   }
               ?>
@@ -50,6 +50,11 @@
               <?php
                   if (isset($array["reg_formerror"]["email"])) {
                       print ('<p class="form__message">Введите e-mail</p>');
+                  }
+              ?>
+              <?php
+                  if (isset($array["reg_formerror"]["mail_busy"])) {
+                      print ('<p class="form__message">Этот e-mail уже зарегестрирован</p>');
                   }
               ?>
 
