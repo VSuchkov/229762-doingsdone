@@ -3,7 +3,6 @@ ini_set('error_reporting', E_ALL);
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 session_start();
-/*require_once("./userdata.php");*/
 require_once('./functions.php');
 
 $con = mysqli_connect("localhost", "root", "", "doingsdone");
@@ -20,11 +19,9 @@ if (!$con) {
         $user_id = $_SESSION["user"]["id"];
         $sql = "SELECT id, project_id, user_id, task, date_done, done FROM tasks WHERE user_id = ?";
         $tasks = get_data($con, $sql, [$user_id]);
-
+        $sql = "SELECT id, name, user_id FROM projects WHERE user_id = ?";
+        $categories = get_data($con, $sql, [$user_id]);
     }
-   /* $sql = "SELECT id, project_id, user_id, task, date_done, done FROM tasks";
-    $tasks = get_data($con, $sql, []); */
-    /*var_dump($tasks);*/
 }
 
 /*проверяем существование переменной*/
@@ -98,20 +95,72 @@ if (isset($_POST["newtask"])) {
         );/*сохраняем файл в корневой каталог*/
     }
 }
+/*добавлении категории*/
+if (isset($_GET["new_project"])) {
+    $showmodal = true;
+    includeTemplate('./templates/form-projects.php', []);
+}
 
+if (isset($_POST["new_project_btn"])) {
+    $cat_formerror = [];
+    $project_data = [];
+    $user_id = $_SESSION["user"]["id"];
+    $new_project = $_POST["new_project"];
+    $project_data += ["new_project" => $new_project];
+    $project_data += ["user_id" => $user_id];
+    $sql = "SELECT name FROM projects WHERE name = ?";
+    $project = get_data($con, $sql, [$new_project]);
+    if (!empty($project)) {
+        $cat_formerror += ["project_busy" => 1];
+    }
+    if ($new_project == "") {
+        $cat_formerror += ["project" => 1];
+    }
+    $errors = count($cat_formerror);
+    if ($errors > 0) { /*считаем количество ошибок*/
+        $showmodal = true;
+        includeTemplate('./templates/form-projects.php', ["categories" => $categories, "cat_formerror" => $cat_formerror, "project" => $project, "showmodal" => $showmodal]);
+    } else {
+
+        $sql = "INSERT INTO projects (name, user_id) VALUES (?, ?)";
+        $res = include_data($con, $sql, $project_data);
+        if ($res) {
+            header("Location: /index.php");
+        } else {
+            print "error";
+        }
+    }
+
+}
+
+/*поиск*/
+$search_error = false;
+if (isset($_POST["search_btn"])) {
+    $search_text = trim($_POST["search"]);
+    if ($search_text == "") {
+        $search_error = true;
+    } else {
+        /*$search_text = explode(" , ", $search_text);*/
+    $search_text = "%$search_text%";
+    var_dump($search_text);
+
+    $sql = " SELECT * FROM tasks WHERE task LIKE ? ";
+    $tasks = get_data($con, $sql, [$search_text]);
+    }
+}
+
+/*регистрация*/
 if (isset($_GET["reg"])) {
     includeTemplate('./templates/register.php', []);
 }
 
 if (isset($_POST["registration"])) {
-    $sql = "SELECT email FROM users";
-    $emails = get_data($con, $sql, []);
-    var_dump($emails);
     $reg_formerror = [];
-    $mail_busy = in_array($_POST["email"], $emails);
-    if ($mail_busy) {
+    $post_mail = $_POST["email"];
+    $sql = "SELECT email FROM users WHERE email = ?";
+    $emails = get_data($con, $sql, [$post_mail]);
+    if (!empty($emails)) {
         $reg_formerror += ["mail_busy" => 1];
-
     }
     var_dump($reg_formerror);
     if ($_POST["email"] == "") {
@@ -156,9 +205,6 @@ if (isset($_POST["enter"])) {
 
             $showmodal = false;
             $_SESSION["user"] = $user;
-
-            /*$sql = "SELECT id, project_id, user_id, task, date_done, done FROM tasks WHERE user_id = $user_id";
-            $tasks = get_data($con, $sql, []);*/
             header("Location: /index.php");
         } else {
             $formerror += ["password" => 1];
@@ -212,7 +258,7 @@ if (isset($_GET["show_completed"])) {
     <?php
         includeTemplate('./templates/header.php', []);
         if (isset($_SESSION["user"])) {
-            includeTemplate('./templates/main.php', ["categories" => $categories, "tasks" => $tasks, "categoryId" => $categoryId, "show_completed" => $show_completed]);
+            includeTemplate('./templates/main.php', ["categories" => $categories, "tasks" => $tasks, "categoryId" => $categoryId, "show_completed" => $show_completed, "search_error" => $search_error]);
         } else {
             includeTemplate('./templates/guest.php', ["showmodal" => $showmodal]);
         }
