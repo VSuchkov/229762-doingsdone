@@ -1,6 +1,12 @@
 {
-    "name": "doingsdone",
-    "description": "Личный проект «Дела в Порядке» от HTML Academy",
-    "type": "project",
-    "require": {}
+    "name": "domains/doingsdone",
+    "authors": [
+        {
+            "name": "Vladimir Suchkov",
+            "email": "ssvovs@mail.ru"
+        }
+    ],
+    "require": {
+        "swiftmailer/swiftmailer": "^6.0"
+    }
 }

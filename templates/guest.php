@@ -28,6 +28,11 @@
   <h2 class="modal__heading">Вход на сайт</h2>
 
   <form class="form" class="" action="index.php" method="post">
+    <?php
+      if ($array["user_add"] == true) {
+          print ('<p class="form__label">Теперь вы можете войти, используя свой email и пароль</p>');
+      }
+    ?>
     <div class="form__row">
       <label class="form__label" for="email">E-mail <sup>*</sup></label>
 

@@ -109,7 +109,11 @@
 
                         <ul class="expand-list hidden">
                             <li class="expand-list__item">
-                                <a href="#">Выполнить</a>
+                                <a href="/index.php?action='done'&task_id=
+                                <?php
+                                    print $val["id"];
+                                ?>
+                                ">Выполнить</a>
                             </li>
 
                             <li class="expand-list__item">
