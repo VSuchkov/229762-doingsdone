@@ -5,6 +5,14 @@
     session_start();
     require_once('./functions.php');
     require_once('./vendor/autoload.php');
+    /*чекбокс*/
+    $show_completed = 0;
+    if (isset($_GET["show_completed"])) {
+        $show_completed = $_GET['show_completed'];
+        setcookie("show_completed", $show_completed, strtotime("+30 days"));
+    } elseif (isset($_COOKIE["show_completed"])) {
+        $show_completed = $_COOKIE["show_completed"];
+    }
 /*
     $transport = Swift_SmtpTransport::newInstance('smtp.example.org', 25);
     $message = Swift_Message::newInstance();
@@ -18,28 +26,42 @@
 */
     $con = mysqli_connect("localhost", "root", "", "doingsdone");
     if (!$con) {
-        print "error";
+        return header("HTTP/1.1 500");
+
     } else {
         $sql = "SELECT id, email, login, password FROM users";
         $users = get_data($con, $sql, []);
-        /*var_dump($users);*/
         if (isset($_SESSION["user"])) {
             $user_id = $_SESSION["user"]["id"];
-            $sql = "SELECT id, project_id, user_id, task, date_done, done FROM tasks WHERE user_id = ? ORDER BY date_done DESC";
-            $tasks = get_data($con, $sql, [$user_id]);
+            $sql = "SELECT id, project_id, user_id, task, date_done, done FROM tasks WHERE user_id = ? AND done = ? ORDER BY date_done DESC";
+            $tasks = get_data($con, $sql, [$user_id, $show_completed]);
             $sql = "SELECT id, name, user_id FROM projects WHERE user_id = ?";
             $categories = get_data($con, $sql, [$user_id]);
         }
     }
     /*проверяем существование переменной*/
     if (isset($_GET["categories"])) {
-    /*получаем номер категории и проверяем её наличие*/
-        $sql = "SELECT id, name FROM projects";
-        $categories = get_data($con, $sql, []);
+            (isset($_SESSION["user"])) {
+                $user_id = $_SESSION["user"]["id"];
+                $sql = "SELECT id, name, user_id FROM projects WHERE user_id = ?";
+                $categories = get_data($con, $sql, [$user_id]);
+            }
         if (isset($categories[$_GET["categories"]])) {
     /*условие для показа задач для проекта*/
             $categoryId = $_GET["categories"];
+            $sql = "SELECT name, user_id FROM projects WHERE id = ?";
+            $categories = get_data($con, $sql, [$categoryId]);
+            if($categories) {
+                    $additional_where = 'AND project_id = ?'; //Добавляем в запрос нужный параметр
+                    $task_data[] = $category_id; //Добавляем в массив параметров параметр категории
+                }
+            }
+
+            $sql = "SELECT * FROM tasks WHERE user_id = ? AND done =? $additional_where ORDER BY date_done DESC";
+            $tasks = get_data($con, $sql, $task_data); //Получаем задания.
+
     /*условие для возврата строки 404*/
+
         } else {
             return header("HTTP/1.1 404 Not Found");
         }
@@ -49,23 +71,26 @@
     }
     $formerror = [];/*массив для ошибок формы задач*/
     $showmodal = false;
+
     /*подключаем форму*/
     if (isset($_GET["add"])) {
         $showmodal = true;
         includeTemplate('./templates/form.php', ["categories" => $categories, "showmodal" => $showmodal]);
     }
+
     if (isset($_POST["newtask"])) {
         $formerror = [];
         $task_data = [];
         $task_data += ["project_id" => $_POST["categories"]];
         $task_data += ["user_id" => $_SESSION["user"]["id"]];
         $task_data += ["task" => htmlspecialchars($_POST["task"])];/*экранируем название задачи*/
-        $date_done = @date('Y.m.d H:m', strtotime(htmlspecialchars($_POST["date"])));
-        /*if ($date_done < date("d/m/Y")) {
-            $formerror += ["date_old" => 1];
-        }*/
+        $date_done = date('Y.m.d H:i', strtotime(htmlspecialchars($_POST["date"])));
+
         $task_data += ["date_done" => $date_done];
         $task_data += ["done" => 0]; /*добавляем сразу ключ-значение выполнения задачи*/
+        if ($date_done < date("Y.m.d H:i")) {
+            $formerror += ["date_old" => 1];
+        }
         if ($_POST["categories"] == "") {
             $formerror += ["categories" => 1]; /*добавляем о том что ошибка истинна*/
         }
@@ -151,9 +176,7 @@
         if ($search_text == "") {
             $search_error = true;
         } else {
-            /*$search_text = explode(" , ", $search_text);*/
             $search_text = "%$search_text%";
-            /*var_dump($search_text);*/
             $user_id = $_SESSION["user"]["id"];
             $sql = " SELECT * FROM tasks WHERE user_id = ? AND task LIKE ? ORDER BY date_done DESC; ";
             $tasks = get_data($con, $sql, [$user_id, $search_text]);
@@ -184,7 +207,7 @@
         }
         $reg_errors = count($reg_formerror);
         if ($reg_errors > 0) {
-            includeTemplate('./templates/register.php', [/*"reg_data" => $reg_data,*/ "reg_formerror" => $reg_formerror]);
+            includeTemplate('./templates/register.php', ["reg_formerror" => $reg_formerror]);
         } else {
             $new_user = [];
             $new_user += ["email" => htmlspecialchars($_POST["email"])];
@@ -194,15 +217,15 @@
             $res = include_data($con, $sql, $new_user);
             if ($res) {
                 $new_user += ["id" => $res];
-                /*$_SESSION["user"] = $new_user;*/
                 $user_add += true;
                 $showmodal = true;
-                /*header("Location: /index.php");*/
             } else {
                 print "error";
             }
         }
     }
+
+    /*вход на сайт*/
     if (isset($_POST["enter"])) {
         $user_data = [];
         $showmodal = true;
@@ -210,7 +233,7 @@
         $user_data += ["password" => password_hash(htmlspecialchars($_POST["password"]), PASSWORD_DEFAULT)];
         $email = $_POST["email"];
         $password = $_POST["password"];
-        if ($user = searchUserByEmail($email, $users)) {
+        if ($user = searchUser($con, $email, $password)) {
             if (password_verify($password, $user["password"])) {
                 $showmodal = false;
                 $_SESSION["user"] = $user;
@@ -219,25 +242,27 @@
                 $formerror += ["password" => 1];
             }
         } else {
+            $user_add = false;
             $formerror += ["email" => 1];
             $usererrors = count($formerror);
             includeTemplate('./templates/header.php', []);
-            includeTemplate('./templates/guest.php', ["userdata" => $user_data, "usererror" => $formerror, "showmodal" => $showmodal]);
+            includeTemplate('./templates/guest.php', ["userdata" => $user_data, "usererror" => $formerror, "showmodal" => $showmodal, "user_add" => $user_add]);
             if ($usererrors > 0) {
                 $showmodal = true;
             }
         }
     }
+
     if (isset($_GET["login"])) {
         $showmodal = true;
     }
-    $show_completed = false;
+    /*счетчик*/
     if (isset($_GET["show_completed"])) {
-        $show_completed = $_GET['show_completed'];
-        setcookie("show_completed", $show_completed, strtotime("+30 days"));
-    } elseif (isset($_COOKIE["show_completed"])) {
-        $show_completed = $_COOKIE["show_completed"];
+        $user_id = $_SESSION["user"]["id"];
+        $sql = "SELECT * FROM tasks WHERE user_id = ? ORDER BY date_done DESC";
+        $tasks = get_data($con, $sql, [$user_id]);
     }
+
     ?>
 
     <!DOCTYPE html>

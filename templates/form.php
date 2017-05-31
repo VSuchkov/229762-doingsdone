@@ -69,6 +69,11 @@
                 print ('<span class="form__error">Заполните это поле</span>');
             }
         ?>
+        <?php
+            if (isset($array["formerror"]["date_old"])) {
+                print ('<span class="form__error">Необходимо указать будущую дату</span>');
+            }
+        ?>
       </div>
 
       <div class="form__row">

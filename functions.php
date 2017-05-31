@@ -33,12 +33,7 @@ function searchUserByEmail($email, $users) {
      }
      return $result;
 }
-/*
-$con = mysqli_connect("localhost", "root", "", "doingsdone");
-$name = $_POST['name'];
-$password = $_POST['password'];
-$sql = 'SELECT users ('name', 'password') VALUES (?, ?)';
-*/
+
 
 function get_data($con, $sql, $data) {
     $data_array = [];
@@ -78,5 +73,13 @@ function update_data($con, $table_name, $update_data, $update_condition) {
         /*var_dump(mysqli_stmt_affected_rows($stmt));*/
         return mysqli_stmt_affected_rows($stmt);
     }
+}
+
+function searchUser($con, $email, $password) {
+    $result = null;
+    $sql = "SELECT id, login, email, password FROM users WHERE email = ?";
+    $user = get_data($con, $sql, [$email]);
+    $result = $user[0];
+    return $result;
 }
 ?>
