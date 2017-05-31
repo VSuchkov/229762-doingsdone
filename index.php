@@ -5,11 +5,8 @@
     session_start();
     require_once('./functions.php');
     require_once('./vendor/autoload.php');
-
-
 /*
     $transport = Swift_SmtpTransport::newInstance('smtp.example.org', 25);
-
     $message = Swift_Message::newInstance();
     $message->setTo(["doingsdone@mail.ru" => "Дела в порядке"]);
     $message->setSubject("Уведомление от сервиса «Дела в порядке»");
@@ -31,8 +28,10 @@
         /*var_dump($users);*/
         if (isset($_SESSION["user"])) {
             $user_id = $_SESSION["user"]["id"];
-            $sql = "SELECT id, project_id, user_id, task, date_done, done FROM tasks WHERE user_id = ?";
+            $sql = "SELECT id, project_id, user_id, task, date_done, done FROM tasks WHERE user_id = ? ORDER BY date_done DESK";
             $tasks = get_data($con, $sql, [$user_id]);
+            /*$sql = "SELECT id, project_id, user_id, task, date_done, done FROM tasks WHERE user_id = ? AND done = 0 ORDER BY date_done DESK";
+            $tasks_without_done = get_data($con, $sql, [$user_id]);*/
             $sql = "SELECT id, name, user_id FROM projects WHERE user_id = ?";
             $categories = get_data($con, $sql, [$user_id]);
         }
@@ -68,7 +67,11 @@
         $task_data += ["project_id" => $_POST["categories"]];
         $task_data += ["user_id" => $_SESSION["user"]["id"]];
         $task_data += ["task" => htmlspecialchars($_POST["task"])];/*экранируем название задачи*/
-        $task_data += ["date_done" => @date('Y.m.d', strtotime(htmlspecialchars($_POST["date"])))];/*экранируем дату*/
+        $date_done = @date('Y.m.d', strtotime(htmlspecialchars($_POST["date"])));
+        /*if ($date_done < date("d/m/Y")) {
+            $formerror += ["date" => 1];
+        }*/
+        $task_data += ["date_done" => $date_done];
         $task_data += ["done" => 0]; /*добавляем сразу ключ-значение выполнения задачи*/
         if ($_POST["categories"] == "") {
             $formerror += ["categories" => 1]; /*добавляем о том что ошибка истинна*/
@@ -107,10 +110,10 @@
         $sql = "SELECT * FROM tasks WHERE id = ?";
         $task_done = get_data($con, $sql, [$task_id]);
         /*var_dump($task_done);*/
-        if ($task_done["done"] == 0) {
+        if ($task_done[0]["done"] == 0) {
             $done_task = update_data($con, "tasks", ["done" => 1], ["id" => $task_id]);
             if ($done_task) {
-            /*header("Location: /index.php");*/
+             header("Location: /index.php");
             }
         }
     }
@@ -156,10 +159,11 @@
             $search_error = true;
         } else {
             /*$search_text = explode(" , ", $search_text);*/
-        $search_text = "%$search_text%";
-        /*var_dump($search_text);*/
-        $sql = " SELECT * FROM tasks WHERE task LIKE ? ";
-        $tasks = get_data($con, $sql, [$search_text]);
+            $search_text = "%$search_text%";
+            /*var_dump($search_text);*/
+            $user_id = $_SESSION["user"]["id"];
+            $sql = " SELECT * FROM tasks WHERE user_id = ? AND task LIKE ? ORDER BY date_done DESC; ";
+            $tasks = get_data($con, $sql, [$user_id, $search_text]);
         }
     }
     /*регистрация*/
@@ -168,7 +172,6 @@
         includeTemplate('./templates/register.php', []);
     }
     if (isset($_POST["registration"])) {
-
         $reg_formerror = [];
         $post_mail = $_POST["email"];
         $sql = "SELECT email FROM users WHERE email = ?";
