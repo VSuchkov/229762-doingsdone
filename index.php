@@ -20,18 +20,13 @@
     if (!$con) {
         print "error";
     } else {
-        /*$sql = "SELECT id, name FROM projects";
-        $categories = get_data($con, $sql, []);
-        var_dump($categories);*/
         $sql = "SELECT id, email, login, password FROM users";
         $users = get_data($con, $sql, []);
         /*var_dump($users);*/
         if (isset($_SESSION["user"])) {
             $user_id = $_SESSION["user"]["id"];
-            $sql = "SELECT id, project_id, user_id, task, date_done, done FROM tasks WHERE user_id = ? ORDER BY date_done DESK";
+            $sql = "SELECT id, project_id, user_id, task, date_done, done FROM tasks WHERE user_id = ? ORDER BY date_done DESC";
             $tasks = get_data($con, $sql, [$user_id]);
-            /*$sql = "SELECT id, project_id, user_id, task, date_done, done FROM tasks WHERE user_id = ? AND done = 0 ORDER BY date_done DESK";
-            $tasks_without_done = get_data($con, $sql, [$user_id]);*/
             $sql = "SELECT id, name, user_id FROM projects WHERE user_id = ?";
             $categories = get_data($con, $sql, [$user_id]);
         }
@@ -55,8 +50,6 @@
     $formerror = [];/*массив для ошибок формы задач*/
     $showmodal = false;
     /*подключаем форму*/
-    if (isset($_GET["new_project"])) {
-    }
     if (isset($_GET["add"])) {
         $showmodal = true;
         includeTemplate('./templates/form.php', ["categories" => $categories, "showmodal" => $showmodal]);
@@ -67,9 +60,9 @@
         $task_data += ["project_id" => $_POST["categories"]];
         $task_data += ["user_id" => $_SESSION["user"]["id"]];
         $task_data += ["task" => htmlspecialchars($_POST["task"])];/*экранируем название задачи*/
-        $date_done = @date('Y.m.d', strtotime(htmlspecialchars($_POST["date"])));
+        $date_done = @date('Y.m.d H:m', strtotime(htmlspecialchars($_POST["date"])));
         /*if ($date_done < date("d/m/Y")) {
-            $formerror += ["date" => 1];
+            $formerror += ["date_old" => 1];
         }*/
         $task_data += ["date_done" => $date_done];
         $task_data += ["done" => 0]; /*добавляем сразу ключ-значение выполнения задачи*/
