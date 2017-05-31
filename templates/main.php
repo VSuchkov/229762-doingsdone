@@ -6,12 +6,12 @@
             <ul class="main-navigation__list">
                 <li class="main-navigation__list-item
                 <?php
-                    if ($array["categoryId"] == 0) {
+                    if ($array["categoryId"] == "") {
                         print ("main-navigation__list-item--active");
                     }
                 ?>
                 ">
-                    <a class="main-navigation__list-item-link" href="./index.php?categoryId=0"> Все </a>
+                    <a class="main-navigation__list-item-link" href="/index.php> Все </a>
                     <span class="main-navigation__list-item-count"> <?= count($array["tasks"]);?> </span>
                 </li>
             <?php foreach ($array['categories'] as $key => $val): ?>
