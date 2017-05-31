@@ -11,7 +11,7 @@
                     }
                 ?>
                 ">
-                    <a class="main-navigation__list-item-link" href="./index.php?categories=0"> Все </a>
+                    <a class="main-navigation__list-item-link" href="./index.php?categoryId=0"> Все </a>
                     <span class="main-navigation__list-item-count"> <?= count($array["tasks"]);?> </span>
                 </li>
             <?php foreach ($array['categories'] as $key => $val): ?>

@@ -28,47 +28,39 @@
     if (!$con) {
         return header("HTTP/1.1 500");
 
-    } else {
-        $sql = "SELECT id, email, login, password FROM users";
-        $users = get_data($con, $sql, []);
-        if (isset($_SESSION["user"])) {
-            $user_id = $_SESSION["user"]["id"];
-            $sql = "SELECT id, project_id, user_id, task, date_done, done FROM tasks WHERE user_id = ? AND done = ? ORDER BY date_done DESC";
-            $tasks = get_data($con, $sql, [$user_id, $show_completed]);
-            $sql = "SELECT id, name, user_id FROM projects WHERE user_id = ?";
-            $categories = get_data($con, $sql, [$user_id]);
-        }
     }
-    /*проверяем существование переменной*/
+    if  (isset($_SESSION["user"])) {
+        $user_id = $_SESSION["user"]["id"];
+        $sql = "SELECT id, name, user_id FROM projects WHERE user_id = ?";
+        $categories = get_data($con, $sql, [$user_id]);
+        $categoryId = "";
+        $task_data = [$user_id, $show_completed];
+        $additional_where = '';
+
     if (isset($_GET["categories"])) {
-            (isset($_SESSION["user"])) {
-                $user_id = $_SESSION["user"]["id"];
-                $sql = "SELECT id, name, user_id FROM projects WHERE user_id = ?";
-                $categories = get_data($con, $sql, [$user_id]);
-            }
-        if (isset($categories[$_GET["categories"]])) {
-    /*условие для показа задач для проекта*/
-            $categoryId = $_GET["categories"];
-            $sql = "SELECT name, user_id FROM projects WHERE id = ?";
-            $categories = get_data($con, $sql, [$categoryId]);
-            if($categories) {
+        $categoryId = $_GET["categories"];
+        $sql = "SELECT name, user_id FROM projects WHERE id = ?";
+        $category = get_data($con, $sql, [$categoryId]);
+
+
+            if($category) {
                     $additional_where = 'AND project_id = ?'; //Добавляем в запрос нужный параметр
-                    $task_data[] = $category_id; //Добавляем в массив параметров параметр категории
-                }
+                    $task_data[] = $categoryId; //Добавляем в массив параметров параметр категории
+            } else {
+                return header("HTTP/1.1 404 Not Found");
             }
 
-            $sql = "SELECT * FROM tasks WHERE user_id = ? AND done =? $additional_where ORDER BY date_done DESC";
-            $tasks = get_data($con, $sql, $task_data); //Получаем задания.
-
-    /*условие для возврата строки 404*/
-
-        } else {
-            return header("HTTP/1.1 404 Not Found");
         }
-    /*условие показывать все задачи(соответствует $categories[0])*/
-    } else {
-        $categoryId = 0;
+        $sql = "SELECT * FROM tasks WHERE user_id = ? AND done =? $additional_where ORDER BY date_done DESC";
+        $tasks = get_data($con, $sql, $task_data);
     }
+
+
+
+
+
+
+
     $formerror = [];/*массив для ошибок формы задач*/
     $showmodal = false;
 
@@ -256,13 +248,6 @@
     if (isset($_GET["login"])) {
         $showmodal = true;
     }
-    /*счетчик*/
-    if (isset($_GET["show_completed"])) {
-        $user_id = $_SESSION["user"]["id"];
-        $sql = "SELECT * FROM tasks WHERE user_id = ? ORDER BY date_done DESC";
-        $tasks = get_data($con, $sql, [$user_id]);
-    }
-
     ?>
 
     <!DOCTYPE html>
